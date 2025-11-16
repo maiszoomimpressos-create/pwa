@@ -1,10 +1,11 @@
 {
-  "name": "Dyad App",
-  "short_name": "DyadApp",
+  "name": "App de Cards",
+  "short_name": "CardsApp",
+  "description": "Organize seus links e ícones favoritos em um só lugar.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "theme_color": "#222222",
   "icons": [
     {
       "src": "/placeholder.svg",
@@ -15,6 +16,12 @@
       "src": "/placeholder.svg",
       "sizes": "512x512",
       "type": "image/svg+xml"
+    },
+    {
+      "src": "/placeholder.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "apple-touch-icon"
     }
   ]
 }
