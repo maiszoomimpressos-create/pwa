@@ -29,22 +29,40 @@ interface IconCardComponentProps {
 const IconMap: { [key: string]: React.ElementType } = LucideIcons;
 
 const IconCardContent: React.FC<{ card: IconCard }> = ({ card }) => {
-  const IconComponent = IconMap[card.icon_name];
-
-  if (!IconComponent) {
+  // Se houver um URL de ícone customizado, exibe a imagem
+  if (card.icon_url) {
     return (
-      <div className="flex flex-col items-center justify-center p-4 h-full w-full bg-destructive/10">
-        <p className="text-sm text-destructive">Ícone não encontrado</p>
+      <div className="flex flex-col items-center justify-center h-full w-full p-2">
+        <img 
+          src={card.icon_url} 
+          alt={card.name || "Ícone Customizado"} 
+          className="h-10 w-10 object-contain" 
+        />
+        <span className="text-sm mt-1 font-medium text-center text-foreground px-1 truncate w-full">
+          {card.name || "Customizado"}
+        </span>
       </div>
     );
   }
 
+  // Se houver um nome de ícone Lucide, exibe o ícone
+  const IconComponent = card.icon_name ? IconMap[card.icon_name] : null;
+
+  if (IconComponent) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full w-full">
+        <IconComponent size={40} style={{ color: card.color }} />
+        <span className="text-sm mt-1 font-medium text-center text-foreground px-1 truncate w-full">
+          {card.name || card.icon_name}
+        </span>
+      </div>
+    );
+  }
+
+  // Fallback se não houver URL nem nome de ícone válido
   return (
-    <div className="flex flex-col items-center justify-center h-full w-full p-2">
-      <IconComponent size={36} style={{ color: card.color }} />
-      <span className="text-sm mt-1 font-medium text-center text-foreground px-1 truncate w-full">
-        {card.name || card.icon_name}
-      </span>
+    <div className="flex flex-col items-center justify-center p-4 h-full w-full bg-destructive/10">
+      <p className="text-sm text-destructive">Ícone Inválido</p>
     </div>
   );
 };
@@ -75,7 +93,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
         .from("icon_card_shares")
         .delete()
         .eq("card_id", card.id)
-        .eq("shared_with_user_id", user?.id);
+        .eq("shared_with_user_id", user?.id); // Garantia extra, mas o RLS já faz isso
 
       error = removeError;
       successMessage = `Compartilhamento do item '${card.name || card.icon_name}' removido com sucesso.`;
