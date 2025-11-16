@@ -34,6 +34,7 @@ const IconGallery: React.FC<IconGalleryProps> = ({ selectedIconName, onSelectIco
       <ScrollArea className="h-[200px] w-full rounded-md border p-4">
         <div className="grid grid-cols-6 gap-2">
           {filteredIcons.map((name) => {
+            // Acessa o componente de ícone diretamente
             const IconComponent = (LucideIcons as any)[name];
             const isSelected = selectedIconName === name;
             

@@ -18,6 +18,7 @@ interface IconCardComponentProps {
 const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardAction }) => {
   const { deleteCard, isDeleting } = useIconCards();
   
+  // Acessa o componente de ícone diretamente
   const IconComponent = card.icon_name ? (LucideIcons as any)[card.icon_name] : null;
   const iconColor = card.icon_name ? card.color : undefined;
 
