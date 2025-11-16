@@ -37,19 +37,23 @@ const Login = () => {
                   email_input_placeholder: "Seu email",
                   password_input_placeholder: "Sua senha",
                   button_label: "Entrar",
-                  link_text: "Já tem uma conta? Entrar",
+                  link_text: "Já tem uma conta? Entrar", // Este link não será visível na view sign_in
                 },
                 forgotten_password: {
                   link_text: "Esqueceu sua senha?",
                 },
-                sign_up: {
-                  link_text: "Não tem uma conta? Cadastre-se",
-                },
+                // Removemos a seção sign_up para evitar conflito com a navegação manual
               },
             }}
           />
-          <div className="mt-4 text-center">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-primary underline">
+          <div className="mt-4 text-center space-y-2">
+            <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-primary underline block">
+              Esqueceu sua senha?
+            </Link>
+            <Link to="/register" className="text-sm text-primary hover:underline block">
+              Não tem uma conta? Cadastre-se
+            </Link>
+            <Link to="/" className="text-sm text-muted-foreground hover:text-primary underline block">
               Voltar ao Início
             </Link>
           </div>
