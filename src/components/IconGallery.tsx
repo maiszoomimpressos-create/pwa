@@ -38,7 +38,8 @@ const IconGallery: React.FC<IconGalleryProps> = ({ selectedIconName, onSelectIco
             const IconComponent = (LucideIcons as any)[name];
             const isSelected = selectedIconName === name;
             
-            if (!IconComponent) return null;
+            // Verifica se é um componente válido (função)
+            if (typeof IconComponent !== 'function') return null;
 
             return (
               <button

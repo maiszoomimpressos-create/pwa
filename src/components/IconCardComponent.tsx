@@ -40,6 +40,9 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
     }
   };
 
+  // Verifica se IconComponent é uma função (componente React válido)
+  const isValidIconComponent = typeof IconComponent === 'function';
+
   return (
     <Card className="flex flex-col justify-between h-full transition-shadow hover:shadow-lg">
       <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between space-y-0">
@@ -66,7 +69,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
           className="w-20 h-20 flex items-center justify-center rounded-xl mb-4"
           style={{ backgroundColor: iconColor ? `${iconColor}1A` : 'transparent' }} // Cor de fundo suave
         >
-          {IconComponent ? (
+          {isValidIconComponent ? (
             <IconComponent className="h-10 w-10" style={{ color: iconColor }} />
           ) : card.icon_url ? (
             <img src={card.icon_url} alt={card.name} className="h-10 w-10 object-contain" />
