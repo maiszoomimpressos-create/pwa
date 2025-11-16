@@ -158,7 +158,6 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
             <EditIconCardDialog card={card} onIconUpdated={onCardAction}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  {/* O botão agora é o trigger do Tooltip, e o TooltipTrigger é o trigger do Dialog (via asChild) */}
                   <Button variant="ghost" size="icon" className="h-7 w-7">
                     <Pencil className="h-4 w-4" />
                   </Button>
@@ -182,23 +181,19 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
               <DropdownMenuContent align="end" className="w-56">
                 {/* Compartilhar */}
                 <ShareIconCardDialog card={card} onShared={onCardAction}>
-                  {/* Usamos asChild para garantir que o DropdownMenuItem seja o trigger */}
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} asChild>
-                    <Button variant="ghost" className="w-full justify-start p-2 h-auto">
-                      <Share2 className="mr-2 h-4 w-4" />
-                      Compartilhar com...
-                    </Button>
+                  {/* Removido asChild e Button, usando DropdownMenuItem como trigger direto */}
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Compartilhar com...
                   </DropdownMenuItem>
                 </ShareIconCardDialog>
                 <DropdownMenuSeparator />
                 {/* Gerenciar */}
                 <ManageSharesDialog card={card} onSharesUpdated={onCardAction}>
-                  {/* Usamos asChild para garantir que o DropdownMenuItem seja o trigger */}
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} asChild>
-                    <Button variant="ghost" className="w-full justify-start p-2 h-auto">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Gerenciar Compartilhamentos
-                    </Button>
+                  {/* Removido asChild e Button, usando DropdownMenuItem como trigger direto */}
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Gerenciar Compartilhamentos
                   </DropdownMenuItem>
                 </ManageSharesDialog>
               </DropdownMenuContent>
@@ -208,16 +203,16 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
 
         {/* Ação de Exclusão/Remoção (Diferente para Proprietário vs. Destinatário) */}
         <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <AlertDialogTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
                   {isOwner ? <Trash2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>{isOwner ? "Excluir Card" : "Remover Compartilhamento"}</TooltipContent>
-            </Tooltip>
-          </AlertDialogTrigger>
+              </AlertDialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent>{isOwner ? "Excluir Card" : "Remover Compartilhamento"}</TooltipContent>
+          </Tooltip>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
