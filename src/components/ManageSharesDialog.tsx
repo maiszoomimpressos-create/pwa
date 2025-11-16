@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Loader2, Trash2, Users, X } from "lucide-react";
+import { Loader2, Trash2, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { IconCard } from "@/hooks/useIconCards";
@@ -61,8 +61,25 @@ const ManageSharesDialog: React.FC<ManageSharesDialogProps> = ({ card, children,
               <div className="p-4">
                 {shares.map((share) => {
                   const recipientProfile = share.profiles;
-                  const recipientName = recipientProfile?.first_name || "Usuário";
-                  const recipientInitials = recipientName.substring(0, 2).toUpperCase();
+                  
+                  let recipientName = "Usuário Desconhecido";
+                  let recipientInitials = "??";
+
+                  if (recipientProfile) {
+                    const firstName = recipientProfile.first_name;
+                    const lastName = recipientProfile.last_name;
+                    
+                    if (firstName && lastName) {
+                      recipientName = `${firstName} ${lastName}`;
+                      recipientInitials = `${firstName[0]}${lastName[0]}`.toUpperCase();
+                    } else if (firstName) {
+                      recipientName = firstName;
+                      recipientInitials = firstName.substring(0, 2).toUpperCase();
+                    }
+                  }
+                  
+                  // Nota: Não podemos exibir o email aqui diretamente via RLS/JOIN, 
+                  // mas o nome do perfil é o melhor que podemos fazer.
 
                   return (
                     <div key={share.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
