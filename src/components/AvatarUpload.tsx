@@ -2,11 +2,12 @@ import React, { useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, Loader2, Trash2 } from "lucide-react";
 import { useAuth } from "@/integrations/supabase/auth";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
+import { Button } from "@/components/ui/button";
 
 interface AvatarUploadProps {
   onAvatarUpdated: () => void;
@@ -80,6 +81,45 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onAvatarUpdated }) => {
     }
   };
   
+  const handleRemoveAvatar = async () => {
+    if (!user || !profile?.avatar_url) return;
+
+    setIsUploading(true);
+    
+    try {
+      // 1. Delete file from Supabase Storage
+      // O caminho é o valor armazenado em profile.avatar_url
+      const { error: deleteError } = await supabase.storage
+        .from('avatars')
+        .remove([profile.avatar_url]);
+
+      // Ignoramos o erro se o recurso não for encontrado (pode ter sido deletado manualmente)
+      if (deleteError && deleteError.message !== 'The resource was not found') {
+        throw new Error("Erro ao deletar a imagem: " + deleteError.message);
+      }
+      
+      // 2. Update profile to set avatar_url to null
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: null, updated_at: new Date().toISOString() })
+        .eq('id', user.id);
+
+      if (updateError) {
+        throw new Error("Erro ao atualizar o perfil após remoção: " + updateError.message);
+      }
+      
+      showSuccess("Avatar removido com sucesso!");
+      refetchProfile();
+      onAvatarUpdated();
+
+    } catch (error) {
+      console.error(error);
+      showError(error instanceof Error ? error.message : "Erro desconhecido ao remover o avatar.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleAvatarClick = () => {
     if (fileInputRef.current && !isUploading) {
       fileInputRef.current.click();
@@ -133,6 +173,24 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onAvatarUpdated }) => {
         className="hidden"
         disabled={isUploading}
       />
+      
+      {/* Botão de Remover Avatar */}
+      {currentAvatarUrl && (
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleRemoveAvatar} 
+          disabled={isUploading}
+          className="text-destructive hover:bg-destructive/10"
+        >
+          {isUploading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Trash2 className="mr-2 h-4 w-4" />
+          )}
+          Remover Avatar
+        </Button>
+      )}
     </div>
   );
 };
