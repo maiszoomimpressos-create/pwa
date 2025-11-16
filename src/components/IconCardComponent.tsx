@@ -131,7 +131,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
           {/* Ações do Proprietário: Edição e Compartilhamento */}
           {isOwner && (
             <>
-              {/* Botão de Edição */}
+              {/* Botão de Edição (Lápis) */}
               <EditIconCardSheet card={card} onIconUpdated={onCardAction}>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -159,7 +159,6 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
                   {/* Compartilhar */}
                   <DropdownMenuItem 
                     onSelect={(e) => {
-                      // Previne o fechamento do DropdownMenu para que o Dialog possa abrir
                       e.preventDefault(); 
                       setIsShareDialogOpen(true);
                     }}
@@ -171,7 +170,6 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
                   {/* Gerenciar */}
                   <DropdownMenuItem 
                     onSelect={(e) => {
-                      // Previne o fechamento do DropdownMenu para que o Dialog possa abrir
                       e.preventDefault(); 
                       setIsManageSharesDialogOpen(true);
                     }}
