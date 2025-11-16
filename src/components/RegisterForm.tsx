@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError } from "@/utils/toast";
 import MaskedInput from "react-text-mask";
-import createAutoCorrectedDateMask from 'text-mask-addons/dist/createAutoCorrectedDateMask';
 
 // Máscara de telefone brasileira (10 ou 11 dígitos: (99) 99999-9999 ou (99) 9999-9999)
 const phoneMask = [
@@ -19,6 +18,8 @@ const phoneMask = [
 const formSchema = z.object({
   email: z.string().email("Email inválido."),
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
+  first_name: z.string().min(1, "Nome é obrigatório."),
+  last_name: z.string().min(1, "Sobrenome é obrigatório."),
   phone: z.string().optional(),
 });
 
@@ -31,6 +32,8 @@ const RegisterForm: React.FC = () => {
     defaultValues: {
       email: "",
       password: "",
+      first_name: "",
+      last_name: "",
       phone: "",
     },
   });
@@ -46,6 +49,8 @@ const RegisterForm: React.FC = () => {
       password: data.password,
       options: {
         data: {
+          first_name: data.first_name,
+          last_name: data.last_name,
           phone: rawPhone,
         },
       },
@@ -62,6 +67,32 @@ const RegisterForm: React.FC = () => {
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="first_name">Nome</Label>
+        <Input
+          id="first_name"
+          type="text"
+          placeholder="Seu nome"
+          {...form.register("first_name")}
+        />
+        {form.formState.errors.first_name && (
+          <p className="text-sm text-destructive">{form.formState.errors.first_name.message}</p>
+        )}
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="last_name">Sobrenome</Label>
+        <Input
+          id="last_name"
+          type="text"
+          placeholder="Seu sobrenome"
+          {...form.register("last_name")}
+        />
+        {form.formState.errors.last_name && (
+          <p className="text-sm text-destructive">{form.formState.errors.last_name.message}</p>
+        )}
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="email">Endereço de Email</Label>
         <Input
