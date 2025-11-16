@@ -36,6 +36,8 @@ const Register = () => {
                   password_label: "Crie uma Senha",
                   email_input_placeholder: "Seu email",
                   password_input_placeholder: "Sua senha",
+                  phone_label: "Número de Telefone", // Adicionando label para telefone
+                  phone_input_placeholder: "Seu telefone (opcional)", // Adicionando placeholder
                   button_label: "Cadastrar",
                   link_text: "Não tem uma conta? Cadastre-se",
                 },
@@ -44,6 +46,16 @@ const Register = () => {
                 },
               },
             }}
+            // Habilitando o campo de telefone
+            fields={[
+              {
+                name: 'phone',
+                label: 'Número de Telefone',
+                placeholder: 'Seu telefone (opcional)',
+                type: 'phone',
+                required: false,
+              },
+            ]}
           />
           <div className="mt-4 text-center">
             <Link to="/" className="text-sm text-muted-foreground hover:text-primary underline">
