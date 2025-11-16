@@ -7,21 +7,20 @@ export interface Profile {
   first_name: string | null;
   last_name: string | null;
   avatar_url: string | null;
-  phone: string | null;
   updated_at: string | null;
 }
 
 const fetchProfile = async (userId: string): Promise<Profile> => {
   const { data, error } = await supabase
     .from("profiles")
-    .select("*")
+    .select("id, first_name, last_name, avatar_url, updated_at") // Selecionando explicitamente os campos restantes
     .eq("id", userId)
     .single();
 
   if (error) {
     throw new Error(error.message);
   }
-  return data;
+  return data as Profile;
 };
 
 const updateProfile = async (profileData: Partial<Profile>) => {
@@ -35,7 +34,7 @@ const updateProfile = async (profileData: Partial<Profile>) => {
   if (error) {
     throw new Error(error.message);
   }
-  return data;
+  return data as Profile;
 };
 
 export const useProfile = () => {

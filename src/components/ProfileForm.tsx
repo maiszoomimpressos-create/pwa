@@ -8,18 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { showSuccess, showError } from "@/utils/toast";
 import { useProfile, Profile } from "@/hooks/useProfile";
-import MaskedInput from "react-text-mask";
-
-// Máscara de telefone brasileira (10 ou 11 dígitos: (99) 99999-9999 ou (99) 9999-9999)
-const phoneMask = [
-  '(', /\d/, /\d/, ')', ' ',
-  /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/
-];
 
 const formSchema = z.object({
   first_name: z.string().min(1, "Nome é obrigatório.").max(50).optional(),
   last_name: z.string().min(1, "Sobrenome é obrigatório.").max(50).optional(),
-  phone: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof formSchema>;
@@ -32,7 +24,6 @@ const ProfileForm: React.FC = () => {
     values: {
       first_name: profile?.first_name || "",
       last_name: profile?.last_name || "",
-      phone: profile?.phone || "",
     },
     mode: "onChange",
   });
@@ -42,7 +33,6 @@ const ProfileForm: React.FC = () => {
       form.reset({
         first_name: profile.first_name || "",
         last_name: profile.last_name || "",
-        phone: profile.phone || "",
       });
     }
   }, [profile, form]);
@@ -50,15 +40,12 @@ const ProfileForm: React.FC = () => {
   const onSubmit = (data: ProfileFormValues) => {
     if (!profile) return;
 
-    // Remove a máscara do telefone antes de enviar
-    const rawPhone = data.phone ? data.phone.replace(/\D/g, '') : null;
-
     updateProfile(
       {
         id: profile.id,
         first_name: data.first_name,
         last_name: data.last_name,
-        phone: rawPhone,
+        // Removemos o campo phone
       },
       {
         onSuccess: () => {
@@ -104,20 +91,6 @@ const ProfileForm: React.FC = () => {
         />
         {form.formState.errors.last_name && (
           <p className="text-sm text-destructive">{form.formState.errors.last_name.message}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="phone">Número de Telefone</Label>
-        <MaskedInput
-          mask={phoneMask}
-          id="phone"
-          placeholder="Ex: (99) 99999-9999"
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          {...form.register("phone")}
-        />
-        {form.formState.errors.phone && (
-          <p className="text-sm text-destructive">{form.formState.errors.phone.message}</p>
         )}
       </div>
 
