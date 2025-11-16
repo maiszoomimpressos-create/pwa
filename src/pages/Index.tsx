@@ -8,10 +8,10 @@ const Index = () => {
   return (
     <div className="flex flex-col items-center justify-center text-center py-20 w-full">
       <h1 className="text-5xl font-extrabold tracking-tight mb-4">
-        Bem-vindo ao App
+        Bem-vindo ao App de Cards
       </h1>
       <p className="text-xl text-muted-foreground mb-10 max-w-xl">
-        Este é o ponto de partida da sua aplicação.
+        Organize seus links e ícones favoritos em um só lugar.
       </p>
 
       {!user ? (
@@ -24,8 +24,8 @@ const Index = () => {
           </Link>
         </div>
       ) : (
-        <Link to="/profile">
-          <Button size="lg">Ir para o Perfil</Button>
+        <Link to="/dashboard">
+          <Button size="lg">Ir para o Dashboard</Button>
         </Link>
       )}
     </div>
