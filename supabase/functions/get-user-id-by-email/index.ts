@@ -12,9 +12,12 @@ serve(async (req) => {
   }
 
   try {
+    console.log("Edge Function started.");
+    
     // 1. Verificar autenticação do usuário que está fazendo a requisição
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.error("Unauthorized: Missing Authorization header.");
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
     }
     
@@ -32,13 +35,19 @@ serve(async (req) => {
 
     // 3. Obter o email do corpo da requisição
     const { email } = await req.json();
+    console.log("Received email:", email);
+    
     if (!email) {
+      console.error("Bad Request: Email is required.");
       return new Response(JSON.stringify({ error: 'Email is required' }), { status: 400, headers: corsHeaders });
     }
 
     // 4. Buscar o usuário na tabela auth.users (acessível apenas com Service Role Key)
+    const filterQuery = `email eq '${email}'`;
+    console.log("Searching users with filter:", filterQuery);
+    
     const { data: users, error: userError } = await supabaseServiceRole.auth.admin.listUsers({
-      filter: `email eq '${email}'`,
+      filter: filterQuery,
     });
 
     if (userError) {
@@ -47,10 +56,12 @@ serve(async (req) => {
     }
 
     if (!users || users.users.length === 0) {
+      console.log("User not found for email:", email);
       return new Response(JSON.stringify({ error: 'User not found' }), { status: 404, headers: corsHeaders });
     }
 
     const targetUserId = users.users[0].id;
+    console.log("Found user ID:", targetUserId);
 
     return new Response(JSON.stringify({ user_id: targetUserId }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
