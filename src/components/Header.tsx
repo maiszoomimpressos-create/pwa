@@ -15,10 +15,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useProfile } from "@/hooks/useProfile";
+import { useNotifications } from "@/hooks/useNotifications"; // Importando o hook de notificações
+import { Badge } from "@/components/ui/badge"; // Importando Badge
 
 const Header = () => {
   const { user, isLoading } = useAuth();
   const { profile } = useProfile();
+  const { unreadCount } = useNotifications(); // Usando o hook de notificações
   const isAuthenticated = !!user;
 
   const handleLogout = async () => {
@@ -55,6 +58,11 @@ const Header = () => {
               <AvatarFallback>{userInitials}</AvatarFallback>
             )}
           </Avatar>
+          {unreadCount > 0 && (
+            <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-xs">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </Badge>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -70,11 +78,18 @@ const Header = () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        {/* Novo item: Notificações */}
+        {/* Item: Notificações com contador */}
         <Link to="/notifications">
-          <DropdownMenuItem>
-            <Bell className="mr-2 h-4 w-4" />
-            <span>Notificações</span>
+          <DropdownMenuItem className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Bell className="mr-2 h-4 w-4" />
+              <span>Notificações</span>
+            </div>
+            {unreadCount > 0 && (
+              <Badge variant="destructive" className="h-5 px-2">
+                {unreadCount}
+              </Badge>
+            )}
           </DropdownMenuItem>
         </Link>
         
@@ -110,8 +125,13 @@ const Header = () => {
               <Link to="/dashboard" className="text-lg font-semibold">
                 Dashboard
               </Link>
-              <Link to="/notifications" className="text-lg font-semibold">
+              <Link to="/notifications" className="text-lg font-semibold flex items-center">
                 Notificações
+                {unreadCount > 0 && (
+                  <Badge variant="destructive" className="ml-2 h-5 px-2">
+                    {unreadCount}
+                  </Badge>
+                )}
               </Link>
               <Link to="/profile" className="text-lg font-semibold">
                 Perfil
