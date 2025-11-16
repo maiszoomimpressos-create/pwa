@@ -37,12 +37,14 @@ const Login = () => {
                   email_input_placeholder: "Seu email",
                   password_input_placeholder: "Sua senha",
                   button_label: "Entrar",
-                  link_text: "Já tem uma conta? Entrar", // Este link não será visível na view sign_in
+                  link_text: "", // Oculta o link de "Já tem uma conta? Entrar" (que não é relevante aqui)
                 },
                 forgotten_password: {
-                  link_text: "Esqueceu sua senha?",
+                  link_text: "", // Oculta o link de "Esqueceu sua senha?"
                 },
-                // Removemos a seção sign_up para evitar conflito com a navegação manual
+                sign_up: {
+                  link_text: "", // Oculta o link de "Don't have an account? Sign up"
+                }
               },
             }}
           />
