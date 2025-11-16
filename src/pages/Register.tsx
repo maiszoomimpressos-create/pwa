@@ -28,6 +28,21 @@ const Register = () => {
             theme="light"
             view="sign_up"
             redirectTo={window.location.origin + "/dashboard"}
+            localization={{
+              variables: {
+                sign_up: {
+                  email_label: "Endereço de Email",
+                  password_label: "Crie uma Senha",
+                  email_input_placeholder: "Seu email",
+                  password_input_placeholder: "Sua senha",
+                  button_label: "Cadastrar",
+                  link_text: "Não tem uma conta? Cadastre-se",
+                },
+                sign_in: {
+                  link_text: "Já tem uma conta? Entrar",
+                },
+              },
+            }}
           />
         </CardContent>
       </Card>

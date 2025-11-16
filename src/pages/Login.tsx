@@ -28,6 +28,24 @@ const Login = () => {
             theme="light"
             view="sign_in"
             redirectTo={window.location.origin + "/dashboard"}
+            localization={{
+              variables: {
+                sign_in: {
+                  email_label: "Endereço de Email",
+                  password_label: "Sua Senha",
+                  email_input_placeholder: "Seu email",
+                  password_input_placeholder: "Sua senha",
+                  button_label: "Entrar",
+                  link_text: "Já tem uma conta? Entrar",
+                },
+                forgotten_password: {
+                  link_text: "Esqueceu sua senha?",
+                },
+                sign_up: {
+                  link_text: "Não tem uma conta? Cadastre-se",
+                },
+              },
+            }}
           />
         </CardContent>
       </Card>

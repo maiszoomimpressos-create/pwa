@@ -27,6 +27,19 @@ const ForgotPassword = () => {
             }}
             theme="light"
             view="forgotten_password"
+            localization={{
+              variables: {
+                forgotten_password: {
+                  email_label: "Endereço de Email",
+                  email_input_placeholder: "Seu email",
+                  button_label: "Enviar instruções de recuperação",
+                  link_text: "Esqueceu sua senha?",
+                },
+                sign_in: {
+                  link_text: "Voltar para o login",
+                },
+              },
+            }}
           />
         </CardContent>
       </Card>
