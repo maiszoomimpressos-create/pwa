@@ -1,7 +1,7 @@
 import { useAuth } from "@/integrations/supabase/auth";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
-import AddIconCardSheet from "@/components/AddIconCardSheet";
+import AddIconCardDialog from "@/components/AddIconCardDialog";
 import { useIconCards } from "@/hooks/useIconCards";
 import IconCardComponent from "@/components/IconCardComponent";
 
@@ -23,11 +23,11 @@ const Dashboard = () => {
       
       {/* Botão de Adicionar Item (mantido no topo, mas o FAB também existe) */}
       <div className="mb-8">
-        <AddIconCardSheet onIconAdded={handleIconAction}>
+        <AddIconCardDialog onIconAdded={handleIconAction}>
           <Button variant="default">
             <Plus className="mr-2 h-4 w-4" /> Adicionar Item
           </Button>
-        </AddIconCardSheet>
+        </AddIconCardDialog>
       </div>
 
       {isLoading ? (
@@ -50,11 +50,11 @@ const Dashboard = () => {
 
       {/* Floating Action Button (FAB) - Movido para o Dashboard */}
       <div className="fixed bottom-8 right-8 z-40">
-        <AddIconCardSheet onIconAdded={handleIconAction}>
+        <AddIconCardDialog onIconAdded={handleIconAction}>
           <Button size="icon" className="h-14 w-14 rounded-full shadow-lg">
             <Plus className="h-6 w-6" />
           </Button>
-        </AddIconCardSheet>
+        </AddIconCardDialog>
       </div>
     </div>
   );
