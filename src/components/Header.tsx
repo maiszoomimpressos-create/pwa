@@ -12,18 +12,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useProfile } from "@/hooks/useProfile";
 
 const Header = () => {
   const { user, isLoading } = useAuth();
+  const { profile } = useProfile();
   const isAuthenticated = !!user;
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
 
-  const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : "US";
+  const userInitials = profile?.first_name && profile.last_name 
+    ? `${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase()
+    : user?.email?.substring(0, 2).toUpperCase() || "US";
+    
+  const avatarUrl = profile?.avatar_url 
+    ? supabase.storage.from('avatars').getPublicUrl(profile.avatar_url).data.publicUrl
+    : null;
 
   const AuthButtons = (
     <>
@@ -41,7 +49,11 @@ const Header = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarFallback>{userInitials}</AvatarFallback>
+            {avatarUrl ? (
+              <AvatarImage src={avatarUrl} alt="Avatar" className="object-cover" />
+            ) : (
+              <AvatarFallback>{userInitials}</AvatarFallback>
+            )}
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
@@ -49,7 +61,7 @@ const Header = () => {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {user?.email || "Usuário"}
+              {profile?.first_name || "Usuário"}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
               {user?.email}
@@ -84,9 +96,6 @@ const Header = () => {
           <Link to="/" className="text-lg font-semibold">
             Home
           </Link>
-          <Link to="/dashboard" className="text-lg font-semibold">
-            Dashboard
-          </Link>
           {isAuthenticated && (
             <Link to="/profile" className="text-lg font-semibold">
               Perfil
@@ -110,7 +119,7 @@ const Header = () => {
           </Link>
         </div>
 
-        {/* Search Bar (Desktop/Tablet) */}
+        {/* Search Bar (Oculta em telas pequenas, visível a partir de md) */}
         <div className="hidden md:flex flex-1 max-w-md mx-4">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

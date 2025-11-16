@@ -2,14 +2,26 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProfileForm from "@/components/ProfileForm";
 import { useAuth } from "@/integrations/supabase/auth";
+import AvatarUpload from "@/components/AvatarUpload";
+import { useProfile } from "@/hooks/useProfile";
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
+  const { refetchProfile } = useProfile();
 
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold">Configurações de Perfil</h1>
       
+      <Card>
+        <CardHeader>
+          <CardTitle>Foto de Perfil</CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center">
+          <AvatarUpload onAvatarUpdated={refetchProfile} />
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Informações Pessoais</CardTitle>

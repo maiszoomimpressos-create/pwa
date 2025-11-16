@@ -55,11 +55,16 @@ export const useProfile = () => {
       queryClient.invalidateQueries({ queryKey: ["profile", userId] });
     },
   });
+  
+  const refetchProfile = () => {
+    profileQuery.refetch();
+  };
 
   return {
     profile: profileQuery.data,
     isLoading: profileQuery.isLoading,
     isUpdating: profileMutation.isPending,
     updateProfile: profileMutation.mutate,
+    refetchProfile,
   };
 };
