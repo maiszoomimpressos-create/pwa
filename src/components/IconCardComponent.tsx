@@ -124,7 +124,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
   );
 
   return (
-    <Card className={cardClasses}>
+    <Card className={cardClasses} id={`card-${card.id}`}> {/* Adicionando o ID aqui */}
       {/* Badge para cards compartilhados */}
       {!isOwner && (
         <Tooltip>

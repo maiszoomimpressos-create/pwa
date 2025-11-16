@@ -26,7 +26,8 @@ const NotificationItem: React.FC<{ notification: Notification, onDelete: (id: st
       icon = <Share2 className="h-5 w-5 text-green-600" />;
       title = "Card Compartilhado";
       description = `${sharerName} compartilhou o card "${content.card_name}" com você.`;
-      actionLink = `/dashboard`; // Redireciona para o dashboard onde o card aparecerá
+      // Link direto para o dashboard, usando o ID do card como hash para identificação
+      actionLink = `/dashboard#card-${content.card_id}`; 
       break;
     default:
       // Fallback
