@@ -21,8 +21,9 @@ const formSchema = z.object({
 
 type ShareFormValues = z.infer<typeof formSchema>;
 
-// URL da Edge Function (usando o ID do projeto Supabase)
-const EDGE_FUNCTION_URL = "https://rqwshksgnnzcdfiensjc.supabase.co/functions/v1/get-user-id-by-email";
+// URLs das Edge Functions (usando o ID do projeto Supabase)
+const GET_USER_ID_URL = "https://rqwshksgnnzcdfiensjc.supabase.co/functions/v1/get-user-id-by-email";
+const CREATE_NOTIFICATION_URL = "https://rqwshksgnnzcdfiensjc.supabase.co/functions/v1/create-notification";
 
 const ShareCardForm: React.FC<ShareCardFormProps> = ({ card, onShared }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +55,6 @@ const ShareCardForm: React.FC<ShareCardFormProps> = ({ card, onShared }) => {
     }
 
     try {
-      // 1. Chamar a Edge Function para buscar o ID do usuário pelo email
       const session = (await supabase.auth.getSession()).data.session;
       
       if (!session) {
@@ -63,7 +63,8 @@ const ShareCardForm: React.FC<ShareCardFormProps> = ({ card, onShared }) => {
       
       const token = session.access_token;
 
-      const response = await fetch(EDGE_FUNCTION_URL, {
+      // 1. Chamar a Edge Function para buscar o ID do usuário pelo email
+      const userResponse = await fetch(GET_USER_ID_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,15 +73,15 @@ const ShareCardForm: React.FC<ShareCardFormProps> = ({ card, onShared }) => {
         body: JSON.stringify({ email: targetEmail }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido na Edge Function.' }));
-        if (response.status === 404) {
+      if (!userResponse.ok) {
+        const errorData = await userResponse.json().catch(() => ({ error: 'Erro desconhecido ao buscar usuário.' }));
+        if (userResponse.status === 404) {
           throw new Error("Usuário com este email não encontrado.");
         }
-        throw new Error(errorData.error || `Erro ao buscar usuário (Status: ${response.status}).`);
+        throw new Error(errorData.error || `Erro ao buscar usuário (Status: ${userResponse.status}).`);
       }
 
-      const { user_id: sharedWithUserId } = await response.json();
+      const { user_id: sharedWithUserId } = await userResponse.json();
       
       if (!sharedWithUserId) {
         throw new Error("ID do usuário destinatário não retornado pela função.");
@@ -96,15 +97,35 @@ const ShareCardForm: React.FC<ShareCardFormProps> = ({ card, onShared }) => {
       if (insertError) {
         if (insertError.code === '23505') { // Código de violação de UNIQUE constraint
           showError("Este card já foi compartilhado com este usuário.");
+          return; // Sai sem tentar criar notificação
         } else {
-          // Se o erro for "Database query failed", ele será capturado aqui.
           throw new Error("Erro ao registrar o compartilhamento: " + insertError.message);
         }
-      } else {
-        showSuccess(`Card compartilhado com sucesso com ${targetEmail}!`);
-        form.reset();
-        onShared();
       }
+      
+      // 3. Chamar a Edge Function para criar a notificação (Substitui o Trigger)
+      const notificationResponse = await fetch(CREATE_NOTIFICATION_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Reutiliza o token do usuário
+        },
+        body: JSON.stringify({
+          card_id: card.id,
+          card_name: card.name,
+          shared_with_user_id: sharedWithUserId,
+          shared_by_user_id: currentUser.id,
+        }),
+      });
+      
+      if (!notificationResponse.ok) {
+        // Logamos o erro, mas não impedimos o sucesso do compartilhamento principal
+        console.error("Falha ao criar notificação via Edge Function:", await notificationResponse.json().catch(() => 'Unknown error'));
+      }
+
+      showSuccess(`Card compartilhado com sucesso com ${targetEmail}!`);
+      form.reset();
+      onShared();
 
     } catch (error) {
       console.error("Erro de compartilhamento:", error);
