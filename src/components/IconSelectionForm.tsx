@@ -1,0 +1,127 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { Check, Loader2, Home, Settings, Bell, Heart, Star, Zap, Sun, Moon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { showError, showSuccess } from "@/utils/toast";
+
+// Lista de ícones disponíveis para demonstração
+const availableIcons = [
+  { name: "Home", Icon: Home },
+  { name: "Settings", Icon: Settings },
+  { name: "Bell", Icon: Bell },
+  { name: "Heart", Icon: Heart },
+  { name: "Star", Icon: Star },
+  { name: "Zap", Icon: Zap },
+  { name: "Sun", Icon: Sun },
+  { name: "Moon", Icon: Moon },
+];
+
+interface IconSelectionFormProps {
+  onIconAdded: () => void;
+}
+
+const IconSelectionForm: React.FC<IconSelectionFormProps> = ({ onIconAdded }) => {
+  const [selectedIconName, setSelectedIconName] = useState<string | null>(null);
+  const [color, setColor] = useState<string>("#000000");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedIconName) {
+      showError("Por favor, selecione um ícone.");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      showError("Usuário não autenticado.");
+      setIsLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.from("icon_cards").insert([
+      {
+        user_id: user.id,
+        icon_name: selectedIconName,
+        color: color,
+      },
+    ]);
+
+    if (error) {
+      console.error("Erro ao salvar ícone:", error);
+      showError("Erro ao adicionar o ícone: " + error.message);
+    } else {
+      showSuccess(`Ícone '${selectedIconName}' adicionado com sucesso!`);
+      setSelectedIconName(null);
+      setColor("#000000");
+      onIconAdded(); // Notifica o pai para fechar o sheet ou atualizar a lista
+    }
+
+    setIsLoading(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <Label>Selecione um Ícone</Label>
+        <div className="grid grid-cols-4 gap-3">
+          {availableIcons.map(({ name, Icon }) => (
+            <Card
+              key={name}
+              className={`cursor-pointer transition-all ${
+                selectedIconName === name
+                  ? "border-primary ring-2 ring-primary"
+                  : "hover:border-primary/50"
+              }`}
+              onClick={() => setSelectedIconName(name)}
+            >
+              <CardContent className="flex flex-col items-center justify-center p-3 relative">
+                <Icon size={24} style={{ color: selectedIconName === name ? color : 'currentColor' }} />
+                <span className="text-xs mt-1 text-center">{name}</span>
+                {selectedIconName === name && (
+                  <Check className="absolute top-1 right-1 h-4 w-4 text-primary" />
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="color">Cor do Ícone</Label>
+        <div className="flex items-center space-x-2">
+          <Input
+            id="color"
+            type="color"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            className="h-10 w-10 p-0 cursor-pointer"
+          />
+          <Input
+            type="text"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            placeholder="#000000"
+            className="flex-1"
+          />
+        </div>
+      </div>
+
+      <Button type="submit" className="w-full" disabled={isLoading || !selectedIconName}>
+        {isLoading ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          "Adicionar Card"
+        )}
+      </Button>
+    </form>
+  );
+};
+
+export default IconSelectionForm;

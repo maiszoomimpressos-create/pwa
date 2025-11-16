@@ -3,9 +3,17 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/integrations/supabase/auth";
 import AddIconCardSheet from "@/components/AddIconCardSheet";
 import { Plus } from "lucide-react";
+import React, { useState } from "react";
 
 const Index = () => {
   const { user } = useAuth();
+  // Estado para forçar a atualização da lista de cards após a adição
+  const [cardRefreshKey, setCardRefreshKey] = useState(0);
+
+  const handleIconAdded = () => {
+    setCardRefreshKey(prev => prev + 1);
+    // Futuramente, aqui chamaremos a função para buscar os cards
+  };
 
   return (
     <div className="flex flex-col items-center justify-center text-center py-20">
@@ -23,7 +31,7 @@ const Index = () => {
           
           {/* Floating Action Button (FAB) */}
           <div className="fixed bottom-8 right-8 z-40">
-            <AddIconCardSheet>
+            <AddIconCardSheet onIconAdded={handleIconAdded}>
               <Button size="icon" className="h-14 w-14 rounded-full shadow-lg">
                 <Plus className="h-6 w-6" />
               </Button>

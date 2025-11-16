@@ -1,29 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import IconSelectionForm from "./IconSelectionForm";
 
 interface AddIconCardSheetProps {
   children: React.ReactNode;
+  onIconAdded: () => void;
 }
 
-const AddIconCardSheet: React.FC<AddIconCardSheetProps> = ({ children }) => {
+const AddIconCardSheet: React.FC<AddIconCardSheetProps> = ({ children, onIconAdded }) => {
+  const [open, setOpen] = useState(false);
+
+  const handleIconAdded = () => {
+    onIconAdded();
+    setOpen(false); // Fecha o sheet após adicionar
+  };
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent side="right" className="sm:max-w-md">
         <SheetHeader>
           <SheetTitle>Adicionar Novo Ícone</SheetTitle>
           <SheetDescription>
-            Selecione um ícone da biblioteca para adicionar à sua tela inicial.
+            Selecione um ícone e uma cor para criar um novo card na sua tela inicial.
           </SheetDescription>
         </SheetHeader>
         
         <div className="py-4">
-          {/* Conteúdo futuro para seleção de ícones */}
-          <p className="text-sm text-muted-foreground">
-            Aqui será a interface para buscar e selecionar ícones.
-          </p>
+          <IconSelectionForm onIconAdded={handleIconAdded} />
         </div>
       </SheetContent>
     </Sheet>
