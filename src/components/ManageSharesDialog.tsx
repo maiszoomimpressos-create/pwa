@@ -8,6 +8,7 @@ import { IconCard } from "@/hooks/useIconCards";
 import { useCardShares, CardShare } from "@/hooks/useCardShares";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useUserEmail } from "@/hooks/useUserEmail"; // Importando o novo hook
 
 interface ManageSharesDialogProps {
   card: IconCard;
@@ -16,9 +17,63 @@ interface ManageSharesDialogProps {
   onSharesUpdated: () => void;
 }
 
+// Componente auxiliar para exibir o destinatário e seu email
+const ShareRecipientItem: React.FC<{ share: CardShare; isRevoking: boolean; onRevoke: (share: CardShare) => void }> = ({ share, isRevoking, onRevoke }) => {
+  const recipientProfile = share.profiles;
+  const { data: email, isLoading: isEmailLoading } = useUserEmail(share.shared_with_user_id);
+
+  let recipientName = "Usuário Desconhecido";
+  let recipientInitials = "??";
+
+  if (recipientProfile) {
+    const firstName = recipientProfile.first_name;
+    const lastName = recipientProfile.last_name;
+    
+    if (firstName && lastName) {
+      recipientName = `${firstName} ${lastName}`;
+      recipientInitials = `${firstName[0]}${lastName[0]}`.toUpperCase();
+    } else if (firstName) {
+      recipientName = firstName;
+      recipientInitials = firstName.substring(0, 2).toUpperCase();
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-between py-2 border-b last:border-b-0">
+      <div className="flex items-center space-x-3 min-w-0">
+        <Avatar className="h-8 w-8 flex-shrink-0">
+          <AvatarFallback>{recipientInitials}</AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col min-w-0">
+          <span className="text-sm font-medium truncate">{recipientName}</span>
+          {isEmailLoading ? (
+            <span className="text-xs text-muted-foreground animate-pulse">Carregando email...</span>
+          ) : (
+            <span className="text-xs text-muted-foreground truncate">{email || "Email não disponível"}</span>
+          )}
+        </div>
+      </div>
+      <Button
+        variant="destructive"
+        size="sm"
+        onClick={() => onRevoke(share)}
+        disabled={isRevoking}
+        className="flex-shrink-0 ml-2"
+      >
+        {isRevoking ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Trash2 className="h-4 w-4" />
+        )}
+      </Button>
+    </div>
+  );
+};
+
+
 const ManageSharesDialog: React.FC<ManageSharesDialogProps> = ({ card, open, onOpenChange, onSharesUpdated }) => {
   const { data: shares, isLoading, refetch } = useCardShares(card.id);
-  const [isRevoking, setIsRevoking] = useState<string | null>(null);
+  const [isRevokingId, setIsRevokingId] = useState<string | null>(null);
 
   // Refetch quando o diálogo abre
   React.useEffect(() => {
@@ -28,7 +83,7 @@ const ManageSharesDialog: React.FC<ManageSharesDialogProps> = ({ card, open, onO
   }, [open, refetch]);
 
   const handleRevokeShare = async (share: CardShare) => {
-    setIsRevoking(share.id);
+    setIsRevokingId(share.id);
 
     // RLS garante que apenas o usuário que compartilhou (proprietário do card) pode deletar este registro.
     const { error } = await supabase
@@ -44,7 +99,7 @@ const ManageSharesDialog: React.FC<ManageSharesDialogProps> = ({ card, open, onO
       refetch();
       onSharesUpdated();
     }
-    setIsRevoking(null);
+    setIsRevokingId(null);
   };
 
   return (
@@ -65,53 +120,14 @@ const ManageSharesDialog: React.FC<ManageSharesDialogProps> = ({ card, open, onO
           ) : shares && shares.length > 0 ? (
             <ScrollArea className="h-60 w-full rounded-md border">
               <div className="p-4">
-                {shares.map((share) => {
-                  const recipientProfile = share.profiles;
-                  
-                  let recipientName = "Usuário Desconhecido";
-                  let recipientInitials = "??";
-
-                  if (recipientProfile) {
-                    const firstName = recipientProfile.first_name;
-                    const lastName = recipientProfile.last_name;
-                    
-                    if (firstName && lastName) {
-                      recipientName = `${firstName} ${lastName}`;
-                      recipientInitials = `${firstName[0]}${lastName[0]}`.toUpperCase();
-                    } else if (firstName) {
-                      recipientName = firstName;
-                      recipientInitials = firstName.substring(0, 2).toUpperCase();
-                    }
-                  }
-                  
-                  // Nota: Não podemos exibir o email aqui diretamente via RLS/JOIN, 
-                  // mas o nome do perfil é o melhor que podemos fazer.
-
-                  return (
-                    <div key={share.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
-                      <div className="flex items-center space-x-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback>{recipientInitials}</AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm font-medium">
-                          {recipientName}
-                        </span>
-                      </div>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleRevokeShare(share)}
-                        disabled={isRevoking === share.id}
-                      >
-                        {isRevoking === share.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  );
-                })}
+                {shares.map((share) => (
+                  <ShareRecipientItem 
+                    key={share.id} 
+                    share={share} 
+                    isRevoking={isRevokingId === share.id} 
+                    onRevoke={handleRevokeShare} 
+                  />
+                ))}
               </div>
             </ScrollArea>
           ) : (
