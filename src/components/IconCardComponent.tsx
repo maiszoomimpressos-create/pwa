@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { IconCard } from "@/hooks/useIconCards";
 import * as LucideIcons from "lucide-react";
-import { Share2, Trash2, Pencil, Users, XCircle } from "lucide-react";
+import { Share2, Trash2, Pencil, Users, XCircle, Settings } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ShareIconCardDialog from "./ShareIconCardDialog";
+import ManageSharesDialog from "./ManageSharesDialog"; // Novo componente
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -125,16 +126,34 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
               </Tooltip>
             </EditIconCardSheet>
 
-            <ShareIconCardDialog card={card} onShared={onCardAction}>
+            {/* Menu de Gerenciamento de Compartilhamento */}
+            <DropdownMenu>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7">
-                    <Share2 className="h-4 w-4" />
-                  </Button>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
                 </TooltipTrigger>
-                <TooltipContent>Compartilhar</TooltipContent>
+                <TooltipContent>Compartilhar / Gerenciar</TooltipContent>
               </Tooltip>
-            </ShareIconCardDialog>
+              <DropdownMenuContent align="end" className="w-56">
+                <ShareIconCardDialog card={card} onShared={onCardAction}>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Compartilhar com...
+                  </DropdownMenuItem>
+                </ShareIconCardDialog>
+                <DropdownMenuSeparator />
+                <ManageSharesDialog card={card} onSharesUpdated={onCardAction}>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Gerenciar Compartilhamentos
+                  </DropdownMenuItem>
+                </ManageSharesDialog>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </>
         )}
 
