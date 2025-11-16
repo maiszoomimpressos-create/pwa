@@ -201,16 +201,16 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
 
         {/* Ação de Exclusão/Remoção (Diferente para Proprietário vs. Destinatário) */}
         <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <AlertDialogTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
                   {isOwner ? <Trash2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>{isOwner ? "Excluir Card" : "Remover Compartilhamento"}</TooltipContent>
-            </Tooltip>
-          </AlertDialogTrigger>
+              </AlertDialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent>{isOwner ? "Excluir Card" : "Remover Compartilhamento"}</TooltipContent>
+          </Tooltip>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
