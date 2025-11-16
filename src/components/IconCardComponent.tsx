@@ -29,7 +29,7 @@ interface IconCardComponentProps {
 const IconMap: { [key: string]: React.ElementType } = LucideIcons;
 
 const IconCardContent: React.FC<{ card: IconCard }> = ({ card }) => {
-  // 1. Se houver um URL de ícone customizado, exibe a imagem
+  // Se houver um URL de ícone customizado, exibe a imagem
   if (card.icon_url) {
     return (
       <div className="flex flex-col items-center justify-center h-full w-full p-2">
@@ -45,7 +45,7 @@ const IconCardContent: React.FC<{ card: IconCard }> = ({ card }) => {
     );
   }
 
-  // 2. Se houver um nome de ícone Lucide, exibe o ícone
+  // Se houver um nome de ícone Lucide, exibe o ícone
   const IconComponent = card.icon_name ? IconMap[card.icon_name] : null;
 
   if (IconComponent) {
@@ -59,7 +59,7 @@ const IconCardContent: React.FC<{ card: IconCard }> = ({ card }) => {
     );
   }
 
-  // 3. Fallback se não houver URL nem nome de ícone válido
+  // Fallback se não houver URL nem nome de ícone válido
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full bg-destructive/10">
       <p className="text-sm text-destructive">Ícone Inválido</p>
@@ -164,16 +164,16 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
 
               {/* Menu de Gerenciamento de Compartilhamento */}
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-7 w-7">
                         <Share2 className="h-4 w-4" />
                       </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Compartilhar / Gerenciar</TooltipContent>
-                  </Tooltip>
-                </DropdownMenuTrigger>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>Compartilhar / Gerenciar</TooltipContent>
+                </Tooltip>
                 <DropdownMenuContent align="end" className="w-56">
                   {/* Compartilhar */}
                   <DropdownMenuItem 

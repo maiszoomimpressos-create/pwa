@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Share, Download, CheckCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { usePWAInstall } from "@/hooks/usePWAInstall"; // Importando o novo hook
 
 const InstallPWAInstructions: React.FC = () => {
   const isMobile = useIsMobile();
@@ -12,21 +12,12 @@ const InstallPWAInstructions: React.FC = () => {
   // 1. Determina se é provável que seja iOS (Safari) ou Android (Chrome)
   const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
   
-  // 2. Se já estiver instalado, não exibe nada.
-  if (isInstalled) {
+  // 2. Se não for móvel ou já estiver instalado, não exibe nada.
+  if (!isMobile || isInstalled) {
     return null;
   }
 
-  // 3. Se não for móvel E não puder instalar (Android/Chrome), não exibe nada.
-  // Se for iOS, ou se puder instalar (Android/Chrome), ou se estiver em modo móvel, exibimos.
-  // No ambiente do iframe, isMobile pode ser false, mas queremos mostrar as instruções se for iOS.
-  const shouldShowButton = isMobile || isIOS || canInstall;
-
-  if (!shouldShowButton) {
-    return null;
-  }
-
-  // 4. Se for Android e o prompt nativo estiver disponível, usamos o botão direto.
+  // 3. Se for Android e o prompt nativo estiver disponível, usamos o botão direto.
   if (canInstall && !isIOS) {
     return (
       <Button 
@@ -40,7 +31,7 @@ const InstallPWAInstructions: React.FC = () => {
     );
   }
 
-  // 5. Caso contrário (iOS ou Android sem prompt nativo disponível), mostramos o diálogo de instruções.
+  // 4. Caso contrário (iOS ou Android sem prompt nativo disponível), mostramos o diálogo de instruções.
   return (
     <Dialog>
       <DialogTrigger asChild>
