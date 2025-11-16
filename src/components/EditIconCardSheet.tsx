@@ -23,7 +23,7 @@ const EditIconCardSheet: React.FC<EditIconCardSheetProps> = ({ card, children, o
   const [link, setLink] = useState<string>(card.link || "");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Resetar o estado quando o sheet for aberto/fechado ou o card mudar
+  // Sincroniza o estado interno com as props do card sempre que o sheet for aberto
   useEffect(() => {
     if (open) {
       setSelectedIconName(card.icon_name);
