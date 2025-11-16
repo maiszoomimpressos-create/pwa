@@ -164,16 +164,16 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
 
               {/* Menu de Gerenciamento de Compartilhamento */}
               <DropdownMenu>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <DropdownMenuTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-7 w-7">
                         <Share2 className="h-4 w-4" />
                       </Button>
-                    </DropdownMenuTrigger>
-                  </TooltipTrigger>
-                  <TooltipContent>Compartilhar / Gerenciar</TooltipContent>
-                </Tooltip>
+                    </TooltipTrigger>
+                    <TooltipContent>Compartilhar / Gerenciar</TooltipContent>
+                  </Tooltip>
+                </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   {/* Compartilhar */}
                   <DropdownMenuItem 
