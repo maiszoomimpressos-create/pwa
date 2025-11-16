@@ -9,7 +9,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile"; // Importando a nova página
+import ProfilePage from "./pages/Profile"; // Importando a nova página
 import { AuthProvider } from "./integrations/supabase/auth";
 import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -53,7 +53,7 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AppLayout>
-                    <Profile />
+                    <ProfilePage />
                   </AppLayout>
                 </ProtectedRoute>
               }

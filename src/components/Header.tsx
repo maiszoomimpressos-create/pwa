@@ -58,7 +58,7 @@ const Header = () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <Link to="/profile">
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <DropdownMenuItem>
             <UserIcon className="mr-2 h-4 w-4" />
             <span>Perfil</span>
           </DropdownMenuItem>
@@ -87,6 +87,11 @@ const Header = () => {
           <Link to="/dashboard" className="text-lg font-semibold">
             Dashboard
           </Link>
+          {isAuthenticated && (
+            <Link to="/profile" className="text-lg font-semibold">
+              Perfil
+            </Link>
+          )}
           <div className="mt-4 space-y-2">
             {!isAuthenticated && AuthButtons}
           </div>

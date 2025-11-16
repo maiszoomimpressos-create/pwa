@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
-import { useProfile } from "@/hooks/useProfile";
+import { showSuccess, showError } from "@/utils/toast";
+import { useProfile, Profile } from "@/hooks/useProfile";
 import MaskedInput from "react-text-mask";
 
 // Máscara de telefone brasileira (10 ou 11 dígitos: (99) 99999-9999 ou (99) 9999-9999)
@@ -16,8 +17,8 @@ const phoneMask = [
 ];
 
 const formSchema = z.object({
-  first_name: z.string().max(50, "Máximo de 50 caracteres.").optional(),
-  last_name: z.string().max(50, "Máximo de 50 caracteres.").optional(),
+  first_name: z.string().min(1, "Nome é obrigatório.").max(50).optional(),
+  last_name: z.string().min(1, "Sobrenome é obrigatório.").max(50).optional(),
   phone: z.string().optional(),
 });
 
@@ -36,15 +37,38 @@ const ProfileForm: React.FC = () => {
     mode: "onChange",
   });
 
+  React.useEffect(() => {
+    if (profile) {
+      form.reset({
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+        phone: profile.phone || "",
+      });
+    }
+  }, [profile, form]);
+
   const onSubmit = (data: ProfileFormValues) => {
+    if (!profile) return;
+
     // Remove a máscara do telefone antes de enviar
     const rawPhone = data.phone ? data.phone.replace(/\D/g, '') : null;
-    
-    updateProfile({
-      first_name: data.first_name || null,
-      last_name: data.last_name || null,
-      phone: rawPhone,
-    });
+
+    updateProfile(
+      {
+        id: profile.id,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        phone: rawPhone,
+      },
+      {
+        onSuccess: () => {
+          showSuccess("Perfil atualizado com sucesso!");
+        },
+        onError: (error) => {
+          showError("Erro ao atualizar perfil: " + error.message);
+        },
+      }
+    );
   };
 
   if (isLoading) {
@@ -56,33 +80,31 @@ const ProfileForm: React.FC = () => {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="first_name">Primeiro Nome</Label>
-          <Input
-            id="first_name"
-            type="text"
-            placeholder="Seu primeiro nome"
-            {...form.register("first_name")}
-          />
-          {form.formState.errors.first_name && (
-            <p className="text-sm text-destructive">{form.formState.errors.first_name.message}</p>
-          )}
-        </div>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-lg mx-auto">
+      <div className="space-y-2">
+        <Label htmlFor="first_name">Nome</Label>
+        <Input
+          id="first_name"
+          type="text"
+          placeholder="Seu nome"
+          {...form.register("first_name")}
+        />
+        {form.formState.errors.first_name && (
+          <p className="text-sm text-destructive">{form.formState.errors.first_name.message}</p>
+        )}
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="last_name">Sobrenome</Label>
-          <Input
-            id="last_name"
-            type="text"
-            placeholder="Seu sobrenome"
-            {...form.register("last_name")}
-          />
-          {form.formState.errors.last_name && (
-            <p className="text-sm text-destructive">{form.formState.errors.last_name.message}</p>
-          )}
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="last_name">Sobrenome</Label>
+        <Input
+          id="last_name"
+          type="text"
+          placeholder="Seu sobrenome"
+          {...form.register("last_name")}
+        />
+        {form.formState.errors.last_name && (
+          <p className="text-sm text-destructive">{form.formState.errors.last_name.message}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -98,12 +120,10 @@ const ProfileForm: React.FC = () => {
           <p className="text-sm text-destructive">{form.formState.errors.phone.message}</p>
         )}
       </div>
-      
-      <Button type="submit" className="w-full" disabled={isUpdating}>
+
+      <Button type="submit" className="w-full" disabled={isUpdating || !form.formState.isDirty}>
         {isUpdating ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...
-          </>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         ) : (
           "Salvar Alterações"
         )}
