@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/integrations/supabase/auth";
+import AddIconCardSheet from "@/components/AddIconCardSheet";
+import { Plus } from "lucide-react";
 
 const Index = () => {
   const { user } = useAuth();
@@ -18,11 +20,20 @@ const Index = () => {
           <Link to="/dashboard">
             <Button size="lg">Ir para o Dashboard</Button>
           </Link>
+          
+          {/* Floating Action Button (FAB) */}
+          <div className="fixed bottom-8 right-8 z-40">
+            <AddIconCardSheet>
+              <Button size="icon" className="h-14 w-14 rounded-full shadow-lg">
+                <Plus className="h-6 w-6" />
+              </Button>
+            </AddIconCardSheet>
+          </div>
         </>
       ) : (
         // Conteúdo vazio quando não autenticado, conforme solicitado.
         <div className="h-64 flex items-center justify-center">
-          {/* Opcionalmente, você pode adicionar um placeholder visual aqui se necessário, mas por enquanto, está vazio. */}
+          {/* Conteúdo vazio */}
         </div>
       )}
     </div>
