@@ -1,28 +1,42 @@
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Share, Download } from "lucide-react";
+import { Share, Download, Smartphone } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
 
 const InstallPWAInstructions: React.FC = () => {
   const isMobile = useIsMobile();
+  const { canInstall, isInstalled, promptInstall } = usePWAInstall();
   
-  // 1. Verifica se o aplicativo está rodando em modo standalone (já instalado)
-  const isInstalled = typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches;
-  
-  // 2. Só exibe se estiver em um dispositivo móvel E não estiver instalado
+  // 3. Determina se é provável que seja iOS (Safari) ou Android (Chrome)
+  const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  // Se já estiver instalado ou não for um dispositivo móvel, não exibe nada.
   if (!isMobile || isInstalled) {
     return null;
   }
 
-  // 3. Determina se é provável que seja iOS (Safari) ou Android (Chrome)
-  const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
-  
+  // Se o navegador suportar o prompt nativo, exibe um botão de instalação direta.
+  if (canInstall) {
+    return (
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        title="Instalar App"
+        onClick={promptInstall}
+      >
+        <Download className="h-5 w-5" />
+      </Button>
+    );
+  }
+
+  // Se não puder instalar nativamente (ex: iOS Safari), exibe o diálogo de instruções.
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon" title="Instalar App">
-          <Download className="h-5 w-5" />
+          <Smartphone className="h-5 w-5" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -58,7 +72,7 @@ const InstallPWAInstructions: React.FC = () => {
         </div>
         
         <p className="text-xs text-center text-muted-foreground mt-4">
-          Se o prompt de instalação não aparecer automaticamente, siga as instruções acima.
+          Siga as instruções do seu navegador para instalar o PWA.
         </p>
       </DialogContent>
     </Dialog>
