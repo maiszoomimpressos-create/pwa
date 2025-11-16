@@ -26,12 +26,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const navigate = useNavigate();
 
   useEffect(() => {
+    // 1. Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
     });
 
+    // 2. Listen for auth state changes
     const { data: listener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
