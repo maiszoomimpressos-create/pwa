@@ -2,6 +2,7 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   return (
@@ -44,6 +45,11 @@ const Register = () => {
               },
             }}
           />
+          <div className="mt-4 text-center">
+            <Link to="/" className="text-sm text-muted-foreground hover:text-primary underline">
+              Voltar ao Início
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
