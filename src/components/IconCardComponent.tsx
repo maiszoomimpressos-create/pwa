@@ -15,7 +15,7 @@ import ManageSharesDialog from "./ManageSharesDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import EditIconCardSheet from "./EditIconCardSheet";
+import EditIconCardDialog from "./EditIconCardDialog"; // Importação atualizada
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/integrations/supabase/auth";
@@ -155,7 +155,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
         {isOwner && (
           <>
             {/* Botão de Edição */}
-            <EditIconCardSheet card={card} onIconUpdated={onCardAction}>
+            <EditIconCardDialog card={card} onIconUpdated={onCardAction}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-7 w-7">
@@ -164,7 +164,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
                 </TooltipTrigger>
                 <TooltipContent>Editar</TooltipContent>
               </Tooltip>
-            </EditIconCardSheet>
+            </EditIconCardDialog>
 
             {/* Menu de Gerenciamento de Compartilhamento */}
             <DropdownMenu>
