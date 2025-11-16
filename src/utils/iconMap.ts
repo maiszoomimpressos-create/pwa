@@ -3,6 +3,7 @@ import { LucideProps } from "lucide-react";
 import React from "react";
 
 // Cria um mapa de ícones válidos (nome -> componente)
+// Filtra por funções e exclui utilitários conhecidos que não são componentes
 export const LucideIconMap: Record<string, React.FC<LucideProps>> = Object.entries(LucideIcons)
   .filter(([, component]) => typeof component === 'function')
   .filter(([name]) => name !== 'createReactComponent' && name !== 'Icon' && name !== 'default')
