@@ -9,7 +9,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
-import ProfilePage from "./pages/Profile"; // Importando a nova página
+import ProfilePage from "./pages/Profile";
+import EditCardPage from "./pages/EditCard"; // Importando a nova página de edição
 import { AuthProvider } from "./integrations/supabase/auth";
 import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -54,6 +55,16 @@ const App = () => (
                 <ProtectedRoute>
                   <AppLayout>
                     <ProfilePage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/edit/:cardId"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <EditCardPage />
                   </AppLayout>
                 </ProtectedRoute>
               }

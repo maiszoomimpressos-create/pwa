@@ -15,10 +15,10 @@ import ManageSharesDialog from "./ManageSharesDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import EditIconCardDialog from "./EditIconCardDialog";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/integrations/supabase/auth";
+import { Link } from "react-router-dom"; // Importando Link
 
 interface IconCardComponentProps {
   card: IconCard;
@@ -154,17 +154,17 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
         {/* Ações do Proprietário: Edição e Compartilhamento */}
         {isOwner && (
           <>
-            {/* Botão de Edição */}
-            <EditIconCardDialog card={card} onIconUpdated={onCardAction}>
-              <Tooltip>
-                <TooltipTrigger asChild>
+            {/* Botão de Edição (Agora navega para a página) */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link to={`/dashboard/edit/${card.id}`}>
                   <Button variant="ghost" size="icon" className="h-7 w-7">
                     <Pencil className="h-4 w-4" />
                   </Button>
-                </TooltipTrigger>
-                <TooltipContent>Editar</TooltipContent>
-              </Tooltip>
-            </EditIconCardDialog>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>Editar</TooltipContent>
+            </Tooltip>
 
             {/* Menu de Gerenciamento de Compartilhamento */}
             <DropdownMenu>
@@ -181,8 +181,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
               <DropdownMenuContent align="end" className="w-56">
                 {/* Compartilhar */}
                 <ShareIconCardDialog card={card} onShared={onCardAction}>
-                  {/* Removido asChild e Button, usando DropdownMenuItem como trigger direto */}
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
                     <Share2 className="mr-2 h-4 w-4" />
                     Compartilhar com...
                   </DropdownMenuItem>
@@ -190,8 +189,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
                 <DropdownMenuSeparator />
                 {/* Gerenciar */}
                 <ManageSharesDialog card={card} onSharesUpdated={onCardAction}>
-                  {/* Removido asChild e Button, usando DropdownMenuItem como trigger direto */}
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
                     Gerenciar Compartilhamentos
                   </DropdownMenuItem>
@@ -203,16 +201,16 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
 
         {/* Ação de Exclusão/Remoção (Diferente para Proprietário vs. Destinatário) */}
         <AlertDialog>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <AlertDialogTrigger asChild>
+          <AlertDialogTrigger asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
                   {isOwner ? <Trash2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                 </Button>
-              </AlertDialogTrigger>
-            </TooltipTrigger>
-            <TooltipContent>{isOwner ? "Excluir Card" : "Remover Compartilhamento"}</TooltipContent>
-          </Tooltip>
+              </TooltipTrigger>
+              <TooltipContent>{isOwner ? "Excluir Card" : "Remover Compartilhamento"}</TooltipContent>
+            </Tooltip>
+          </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
