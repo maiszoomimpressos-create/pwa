@@ -29,7 +29,7 @@ interface IconCardComponentProps {
 const IconMap: { [key: string]: React.ElementType } = LucideIcons;
 
 const IconCardContent: React.FC<{ card: IconCard }> = ({ card }) => {
-  // Se houver um URL de ícone customizado, exibe a imagem
+  // 1. Se houver um URL de ícone customizado, exibe a imagem
   if (card.icon_url) {
     return (
       <div className="flex flex-col items-center justify-center h-full w-full p-2">
@@ -45,7 +45,7 @@ const IconCardContent: React.FC<{ card: IconCard }> = ({ card }) => {
     );
   }
 
-  // Se houver um nome de ícone Lucide, exibe o ícone
+  // 2. Se houver um nome de ícone Lucide, exibe o ícone
   const IconComponent = card.icon_name ? IconMap[card.icon_name] : null;
 
   if (IconComponent) {
@@ -59,7 +59,7 @@ const IconCardContent: React.FC<{ card: IconCard }> = ({ card }) => {
     );
   }
 
-  // Fallback se não houver URL nem nome de ícone válido
+  // 3. Fallback se não houver URL nem nome de ícone válido
   return (
     <div className="flex flex-col items-center justify-center p-4 h-full w-full bg-destructive/10">
       <p className="text-sm text-destructive">Ícone Inválido</p>
