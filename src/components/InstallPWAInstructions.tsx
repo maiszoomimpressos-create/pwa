@@ -1,7 +1,7 @@
 import React from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Share, Download, Smartphone, Chrome, Safari } from "lucide-react";
+import { Share, Download, Smartphone, Globe, Monitor } from "lucide-react";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 
 interface InstallPWAInstructionsProps {
@@ -32,7 +32,7 @@ const InstallPWAInstructions: React.FC<InstallPWAInstructionsProps> = ({ childre
       return (
         <div className="space-y-4">
           <div className="flex items-center space-x-2 text-lg font-semibold">
-            <Safari className="h-6 w-6 text-blue-500" />
+            <Globe className="h-6 w-6 text-blue-500" />
             <span>Instalação no iOS (Safari)</span>
           </div>
           <ol className="list-decimal list-inside space-y-2 text-sm">
@@ -51,7 +51,7 @@ const InstallPWAInstructions: React.FC<InstallPWAInstructionsProps> = ({ childre
     return (
       <div className="space-y-4">
         <div className="flex items-center space-x-2 text-lg font-semibold">
-          <Chrome className="h-6 w-6 text-green-600" />
+            <Monitor className="h-6 w-6 text-green-600" />
           <span>Instalação no Desktop (Chrome/Edge)</span>
         </div>
         <ol className="list-decimal list-inside space-y-2 text-sm">
