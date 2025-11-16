@@ -19,14 +19,7 @@ const NotificationItem: React.FC<{ notification: Notification, onDelete: (id: st
   let description = "Detalhes da atividade.";
   let actionLink = null;
   
-  // Determina o nome do remetente
-  let sharerName = "Um usuário";
-  if (sharer_profile?.first_name) {
-    sharerName = sharer_profile.first_name;
-    if (sharer_profile.last_name) {
-      sharerName += ` ${sharer_profile.last_name}`;
-    }
-  }
+  const sharerName = sharer_profile?.first_name || "Um usuário";
   
   switch (type) {
     case 'card_shared':
