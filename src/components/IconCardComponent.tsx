@@ -154,7 +154,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
         {/* Ações do Proprietário: Edição e Compartilhamento */}
         {isOwner && (
           <>
-            {/* Botão de Edição (Agora navega para a página) */}
+            {/* Botão de Edição (Navega para a página) */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link to={`/dashboard/edit/${card.id}`}>
