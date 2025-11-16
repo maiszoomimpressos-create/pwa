@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { IconCard } from "@/hooks/useIconCards";
 import * as LucideIcons from "lucide-react";
-import { Share2, Trash2, Pencil, Users } from "lucide-react";
+import { Share2, Trash2, Pencil, Users, XCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,14 +55,32 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
 
   const handleDelete = async () => {
     setIsDeleting(true);
-    // RLS garante que apenas o proprietário pode excluir
-    const { error } = await supabase.from("icon_cards").delete().eq("id", card.id);
+    
+    let error: { message: string } | null = null;
+    let successMessage = "";
+
+    if (isOwner) {
+      // Excluir o card original (RLS garante que apenas o proprietário pode fazer isso)
+      const { error: deleteError } = await supabase.from("icon_cards").delete().eq("id", card.id);
+      error = deleteError;
+      successMessage = `Item '${card.name || card.icon_name}' excluído com sucesso.`;
+    } else {
+      // Remover o registro de compartilhamento (RLS garante que apenas o destinatário pode fazer isso)
+      const { error: removeError } = await supabase
+        .from("icon_card_shares")
+        .delete()
+        .eq("card_id", card.id)
+        .eq("shared_with_user_id", user?.id); // Garantia extra, mas o RLS já faz isso
+
+      error = removeError;
+      successMessage = `Compartilhamento do item '${card.name || card.icon_name}' removido com sucesso.`;
+    }
 
     if (error) {
-      console.error("Erro ao excluir card:", error);
-      showError("Erro ao excluir o item: " + error.message);
+      console.error("Erro na ação do card:", error);
+      showError("Erro ao realizar a ação: " + error.message);
     } else {
-      showSuccess(`Item '${card.name || card.icon_name}' excluído com sucesso.`);
+      showSuccess(successMessage);
       onCardAction();
     }
     setIsDeleting(false);
@@ -93,63 +111,65 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
       {/* Ações (Visíveis no hover ou em telas pequenas) */}
       <div className="flex justify-center space-x-2 p-1 opacity-0 group-hover:opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
         
-        {/* Botão de Edição (Apenas para o proprietário) */}
+        {/* Ações do Proprietário: Edição e Compartilhamento */}
         {isOwner && (
-          <EditIconCardSheet card={card} onIconUpdated={onCardAction}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7">
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Editar</TooltipContent>
-            </Tooltip>
-          </EditIconCardSheet>
-        )}
-
-        {/* Botão de Compartilhamento (Apenas para o proprietário) */}
-        {isOwner && (
-          <ShareIconCardDialog card={card} onShared={onCardAction}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7">
-                  <Share2 className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Compartilhar</TooltipContent>
-            </Tooltip>
-          </ShareIconCardDialog>
-        )}
-
-        {/* Botão de Exclusão (Apenas para o proprietário) */}
-        {isOwner && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
+          <>
+            <EditIconCardSheet card={card} onIconUpdated={onCardAction}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
-                    <Trash2 className="h-4 w-4" />
+                  <Button variant="ghost" size="icon" className="h-7 w-7">
+                    <Pencil className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Excluir</TooltipContent>
+                <TooltipContent>Editar</TooltipContent>
               </Tooltip>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Esta ação não pode ser desfeita. Isso excluirá permanentemente o card "{card.name || card.icon_name}".
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
-                  {isDeleting ? "Excluindo..." : "Excluir"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            </EditIconCardSheet>
+
+            <ShareIconCardDialog card={card} onShared={onCardAction}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-7 w-7">
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Compartilhar</TooltipContent>
+              </Tooltip>
+            </ShareIconCardDialog>
+          </>
         )}
+
+        {/* Ação de Exclusão/Remoção (Diferente para Proprietário vs. Destinatário) */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
+                  {isOwner ? <Trash2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{isOwner ? "Excluir Card" : "Remover Compartilhamento"}</TooltipContent>
+            </Tooltip>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {isOwner ? "Tem certeza que deseja excluir este card?" : "Tem certeza que deseja remover este compartilhamento?"}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {isOwner 
+                  ? `Esta ação excluirá permanentemente o card "${card.name || card.icon_name}" para todos.`
+                  : `Esta ação apenas removerá o card "${card.name || card.icon_name}" do seu Dashboard. O card original não será afetado.`
+                }
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
+                {isDeleting ? "Processando..." : (isOwner ? "Excluir Permanentemente" : "Remover")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </Card>
   );
