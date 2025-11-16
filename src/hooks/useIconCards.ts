@@ -5,8 +5,7 @@ import { useAuth } from "@/integrations/supabase/auth";
 export interface IconCard {
   id: string;
   user_id: string; // ID do proprietário do card
-  icon_name: string | null; // Pode ser null se icon_url for usado
-  icon_url: string | null; // Novo campo para ícones customizados
+  icon_name: string;
   color: string;
   name: string | null;
   link: string | null;

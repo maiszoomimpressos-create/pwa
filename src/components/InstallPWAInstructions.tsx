@@ -1,37 +1,23 @@
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Share, Download, CheckCircle } from "lucide-react";
+import { Share, Download } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { usePWAInstall } from "@/hooks/usePWAInstall"; // Importando o novo hook
 
 const InstallPWAInstructions: React.FC = () => {
   const isMobile = useIsMobile();
-  const { canInstall, isInstalled, promptInstall } = usePWAInstall();
   
-  // 1. Determina se é provável que seja iOS (Safari) ou Android (Chrome)
-  const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
+  // 1. Verifica se o aplicativo está rodando em modo standalone (já instalado)
+  const isInstalled = typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches;
   
-  // 2. Se não for móvel ou já estiver instalado, não exibe nada.
+  // 2. Só exibe se estiver em um dispositivo móvel E não estiver instalado
   if (!isMobile || isInstalled) {
     return null;
   }
 
-  // 3. Se for Android e o prompt nativo estiver disponível, usamos o botão direto.
-  if (canInstall && !isIOS) {
-    return (
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        title="Instalar App"
-        onClick={promptInstall}
-      >
-        <Download className="h-5 w-5" />
-      </Button>
-    );
-  }
-
-  // 4. Caso contrário (iOS ou Android sem prompt nativo disponível), mostramos o diálogo de instruções.
+  // 3. Determina se é provável que seja iOS (Safari) ou Android (Chrome)
+  const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
+  
   return (
     <Dialog>
       <DialogTrigger asChild>

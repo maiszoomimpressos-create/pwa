@@ -2,51 +2,26 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Image, Zap } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
-import IconGallery from "./IconGallery";
-import IconUpload from "./IconUpload"; // Importando o novo componente
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import IconGallery from "./IconGallery"; // Importando a nova galeria
 
 interface IconSelectionFormProps {
   onIconAdded: () => void;
-  initialIconName?: string | null;
-  initialIconUrl?: string | null;
 }
 
-const IconSelectionForm: React.FC<IconSelectionFormProps> = ({ 
-  onIconAdded,
-  initialIconName = null,
-  initialIconUrl = null,
-}) => {
-  const [selectedIconName, setSelectedIconName] = useState<string | null>(initialIconName);
-  const [iconUrl, setIconUrl] = useState<string | null>(initialIconUrl);
+const IconSelectionForm: React.FC<IconSelectionFormProps> = ({ onIconAdded }) => {
+  const [selectedIconName, setSelectedIconName] = useState<string | null>(null);
   const [color, setColor] = useState<string>("#000000");
   const [name, setName] = useState<string>("");
   const [link, setLink] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
-  const [tab, setTab] = useState<'lucide' | 'custom'>(initialIconUrl ? 'custom' : 'lucide');
-
-  // Lógica para garantir que apenas um tipo de ícone esteja ativo
-  const handleSelectLucideIcon = (iconName: string) => {
-    setSelectedIconName(iconName);
-    setIconUrl(null); // Limpa o URL customizado
-  };
-
-  const handleUploadSuccess = (url: string) => {
-    setIconUrl(url);
-    setSelectedIconName(null); // Limpa o ícone Lucide
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const finalIconName = tab === 'lucide' ? selectedIconName : null;
-    const finalIconUrl = tab === 'custom' ? iconUrl : null;
-
-    if (!finalIconName && !finalIconUrl) {
-      showError("Por favor, selecione ou faça upload de um ícone.");
+    if (!selectedIconName) {
+      showError("Por favor, selecione um ícone.");
       return;
     }
     if (!name.trim()) {
@@ -67,11 +42,10 @@ const IconSelectionForm: React.FC<IconSelectionFormProps> = ({
     const { error } = await supabase.from("icon_cards").insert([
       {
         user_id: user.id,
-        icon_name: finalIconName,
-        icon_url: finalIconUrl, // Novo campo
+        icon_name: selectedIconName,
         color: color,
         name: name.trim(),
-        link: link.trim() || null,
+        link: link.trim() || null, // Salva link ou null se vazio
       },
     ]);
 
@@ -80,14 +54,11 @@ const IconSelectionForm: React.FC<IconSelectionFormProps> = ({
       showError("Erro ao adicionar o item: " + error.message);
     } else {
       showSuccess(`Item '${name}' adicionado com sucesso!`);
-      // Resetar estados
       setSelectedIconName(null);
-      setIconUrl(null);
       setColor("#000000");
       setName("");
       setLink("");
-      setTab('lucide');
-      onIconAdded();
+      onIconAdded(); // Notifica o pai para fechar o sheet ou atualizar a lista
     }
 
     setIsLoading(false);
@@ -109,41 +80,16 @@ const IconSelectionForm: React.FC<IconSelectionFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label>Selecione o Tipo de Ícone</Label>
-        <Tabs value={tab} onValueChange={(value) => setTab(value as 'lucide' | 'custom')} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="lucide">
-              <Zap className="h-4 w-4 mr-2" /> Ícones Padrão
-            </TabsTrigger>
-            <TabsTrigger value="custom">
-              <Image className="h-4 w-4 mr-2" /> Ícone Customizado
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="lucide" className="mt-4">
-            <IconGallery 
-              selectedIconName={selectedIconName}
-              onSelectIcon={handleSelectLucideIcon}
-              color={color}
-            />
-          </TabsContent>
-          <TabsContent value="custom" className="mt-4">
-            <IconUpload 
-              onUploadSuccess={handleUploadSuccess} 
-              currentIconUrl={iconUrl}
-            />
-            {iconUrl && (
-              <div className="mt-4 p-3 border rounded-lg flex items-center justify-between">
-                <span className="text-sm font-medium">Ícone Customizado Selecionado:</span>
-                <img src={iconUrl} alt="Ícone customizado" className="h-8 w-8 object-contain" />
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+        <Label>Selecione um Ícone</Label>
+        <IconGallery 
+          selectedIconName={selectedIconName}
+          onSelectIcon={setSelectedIconName}
+          color={color}
+        />
       </div>
 
-      {/* A cor só é relevante para ícones Lucide, mas mantemos o campo */}
       <div className="space-y-2">
-        <Label htmlFor="color">Cor do Ícone (Apenas para Ícones Padrão)</Label>
+        <Label htmlFor="color">Cor do Ícone</Label>
         <div className="flex items-center space-x-2">
           <Input
             id="color"
@@ -151,7 +97,6 @@ const IconSelectionForm: React.FC<IconSelectionFormProps> = ({
             value={color}
             onChange={(e) => setColor(e.target.value)}
             className="h-10 w-10 p-0 cursor-pointer"
-            disabled={tab === 'custom'}
           />
           <Input
             type="text"
@@ -159,7 +104,6 @@ const IconSelectionForm: React.FC<IconSelectionFormProps> = ({
             onChange={(e) => setColor(e.target.value)}
             placeholder="#000000"
             className="flex-1"
-            disabled={tab === 'custom'}
           />
         </div>
       </div>
@@ -175,11 +119,7 @@ const IconSelectionForm: React.FC<IconSelectionFormProps> = ({
         />
       </div>
 
-      <Button 
-        type="submit" 
-        className="w-full" 
-        disabled={isLoading || (!selectedIconName && !iconUrl) || !name.trim()}
-      >
+      <Button type="submit" className="w-full" disabled={isLoading || !selectedIconName || !name.trim()}>
         {isLoading ? (
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         ) : (
