@@ -2,22 +2,10 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
-import { Check, Loader2, Home, Settings, Bell, Heart, Star, Zap, Sun, Moon } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
-
-// Lista de ícones disponíveis para demonstração
-const availableIcons = [
-  { name: "Home", Icon: Home },
-  { name: "Settings", Icon: Settings },
-  { name: "Bell", Icon: Bell },
-  { name: "Heart", Icon: Heart },
-  { name: "Star", Icon: Star },
-  { name: "Zap", Icon: Zap },
-  { name: "Sun", Icon: Sun },
-  { name: "Moon", Icon: Moon },
-];
+import IconGallery from "./IconGallery"; // Importando a nova galeria
 
 interface IconSelectionFormProps {
   onIconAdded: () => void;
@@ -93,27 +81,11 @@ const IconSelectionForm: React.FC<IconSelectionFormProps> = ({ onIconAdded }) =>
 
       <div className="space-y-2">
         <Label>Selecione um Ícone</Label>
-        <div className="grid grid-cols-4 gap-3">
-          {availableIcons.map(({ name: iconName, Icon }) => (
-            <Card
-              key={iconName}
-              className={`cursor-pointer transition-all ${
-                selectedIconName === iconName
-                  ? "border-primary ring-2 ring-primary"
-                  : "hover:border-primary/50"
-              }`}
-              onClick={() => setSelectedIconName(iconName)}
-            >
-              <CardContent className="flex flex-col items-center justify-center p-3 relative">
-                <Icon size={24} style={{ color: selectedIconName === iconName ? color : 'currentColor' }} />
-                <span className="text-xs mt-1 text-center">{iconName}</span>
-                {selectedIconName === iconName && (
-                  <Check className="absolute top-1 right-1 h-4 w-4 text-primary" />
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <IconGallery 
+          selectedIconName={selectedIconName}
+          onSelectIcon={setSelectedIconName}
+          color={color}
+        />
       </div>
 
       <div className="space-y-2">

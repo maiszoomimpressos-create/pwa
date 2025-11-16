@@ -14,8 +14,8 @@ const Index = () => {
   
   const { data: iconCards, isLoading, refetch } = useIconCards();
 
-  const handleIconAdded = () => {
-    refetch(); // Busca os cards novamente após a adição
+  const handleIconAction = () => {
+    refetch(); // Busca os cards novamente após a adição, compartilhamento ou exclusão
     setCardRefreshKey(prev => prev + 1); // Mantém o estado de refreshKey se necessário para outros usos
   };
 
@@ -45,7 +45,7 @@ const Index = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 w-full max-w-4xl">
           {iconCards && iconCards.length > 0 ? (
             iconCards.map((card) => (
-              <IconCardComponent key={card.id} card={card} />
+              <IconCardComponent key={card.id} card={card} onCardAction={handleIconAction} />
             ))
           ) : (
             <div className="col-span-full text-center p-10 border border-dashed rounded-lg text-muted-foreground">
@@ -57,7 +57,7 @@ const Index = () => {
 
       {/* Floating Action Button (FAB) */}
       <div className="fixed bottom-8 right-8 z-40">
-        <AddIconCardSheet onIconAdded={handleIconAdded}>
+        <AddIconCardSheet onIconAdded={handleIconAction}>
           <Button size="icon" className="h-14 w-14 rounded-full shadow-lg">
             <Plus className="h-6 w-6" />
           </Button>
