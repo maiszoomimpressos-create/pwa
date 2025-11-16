@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ShareIconCardDialog from "./ShareIconCardDialog";
-import ManageSharesDialog from "./ManageSharesDialog"; // Novo componente
+import ManageSharesDialog from "./ManageSharesDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -40,8 +40,8 @@ const IconCardContent: React.FC<{ card: IconCard }> = ({ card }) => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-full w-full">
-      <IconComponent size={40} style={{ color: card.color }} />
+    <div className="flex flex-col items-center justify-center h-full w-full p-2">
+      <IconComponent size={36} style={{ color: card.color }} />
       <span className="text-sm mt-1 font-medium text-center text-foreground px-1 truncate w-full">
         {card.name || card.icon_name}
       </span>
@@ -87,8 +87,8 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
     setIsDeleting(false);
   };
   
-  // Aumentando o tamanho do card para acomodar as ações
-  const cardClasses = "relative flex flex-col justify-between p-2 h-36 w-36 transition-shadow hover:shadow-lg group";
+  // Ajustando o tamanho do card para acomodar as ações visíveis
+  const cardClasses = "relative flex flex-col justify-between p-0 h-40 w-36 transition-shadow hover:shadow-lg";
 
   const CardInner = (
     <Card className={cardClasses}>
@@ -96,7 +96,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
       {!isOwner && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="absolute top-1 left-1 p-1 rounded-full bg-secondary/80 text-secondary-foreground">
+            <div className="absolute top-1 left-1 p-1 rounded-full bg-secondary/80 text-secondary-foreground z-10">
               <Users className="h-3 w-3" />
             </div>
           </TooltipTrigger>
@@ -109,8 +109,8 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
         <IconCardContent card={card} />
       </CardContent>
 
-      {/* Ações (Visíveis no hover ou em telas pequenas) */}
-      <div className="flex justify-center space-x-2 p-1 opacity-0 group-hover:opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
+      {/* Ações (Sempre Visíveis) */}
+      <div className="flex justify-center space-x-1 p-1 border-t bg-muted/30">
         
         {/* Ações do Proprietário: Edição e Compartilhamento */}
         {isOwner && (
