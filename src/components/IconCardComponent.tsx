@@ -124,7 +124,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
   );
 
   return (
-    <Card className={cardClasses} id={`card-${card.id}`}> {/* Adicionando o ID aqui */}
+    <Card className={cardClasses}>
       {/* Badge para cards compartilhados */}
       {!isOwner && (
         <Tooltip>
@@ -201,16 +201,16 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
 
         {/* Ação de Exclusão/Remoção (Diferente para Proprietário vs. Destinatário) */}
         <AlertDialog>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <AlertDialogTrigger asChild>
+          <AlertDialogTrigger asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
                   {isOwner ? <Trash2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
                 </Button>
-              </AlertDialogTrigger>
-            </TooltipTrigger>
-            <TooltipContent>{isOwner ? "Excluir Card" : "Remover Compartilhamento"}</TooltipContent>
-          </Tooltip>
+              </TooltipTrigger>
+              <TooltipContent>{isOwner ? "Excluir Card" : "Remover Compartilhamento"}</TooltipContent>
+            </Tooltip>
+          </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>

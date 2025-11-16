@@ -27,8 +27,7 @@ const AddIconCardDialog: React.FC<AddIconCardDialogProps> = ({ children, onIconA
           </DialogDescription>
         </DialogHeader>
         
-        {/* Envolve o formulário inteiro na ScrollArea */}
-        <ScrollArea className="h-full overflow-y-auto pr-4">
+        <ScrollArea className="flex-grow pr-4">
           <div className="py-4">
             <IconSelectionForm onIconAdded={handleIconAdded} />
           </div>

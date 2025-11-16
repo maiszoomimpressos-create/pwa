@@ -4,38 +4,15 @@ import { Plus, Loader2 } from "lucide-react";
 import AddIconCardDialog from "@/components/AddIconCardDialog";
 import { useIconCards } from "@/hooks/useIconCards";
 import IconCardComponent from "@/components/IconCardComponent";
-import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const location = useLocation();
   
   const { data: iconCards, isLoading, refetch } = useIconCards();
 
   const handleIconAction = () => {
     refetch(); // Busca os cards novamente após a adição, compartilhamento ou exclusão
   };
-  
-  // Efeito para rolar até o card se houver um hash na URL (ex: #card-UUID)
-  useEffect(() => {
-    if (location.hash) {
-      const elementId = location.hash.substring(1); // Remove o '#'
-      const element = document.getElementById(elementId);
-      if (element) {
-        // Rola suavemente para o elemento e adiciona um pequeno destaque visual
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        
-        // Adiciona uma classe de destaque temporária
-        element.classList.add('ring-4', 'ring-primary/50', 'ring-offset-2', 'transition-all', 'duration-500');
-        
-        // Remove a classe de destaque após 3 segundos
-        setTimeout(() => {
-          element.classList.remove('ring-4', 'ring-primary/50', 'ring-offset-2');
-        }, 3000);
-      }
-    }
-  }, [location.hash, iconCards]); // Depende de iconCards para garantir que eles foram carregados
 
   return (
     <div className="p-4 md:p-8">

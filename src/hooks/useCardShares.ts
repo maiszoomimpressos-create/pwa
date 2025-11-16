@@ -17,23 +17,17 @@ export interface CardShare {
 
 const fetchCardShares = async (cardId: string): Promise<CardShare[]> => {
   // Buscamos os compartilhamentos e fazemos um JOIN com a tabela 'profiles'
-  // A relação é feita automaticamente via shared_with_user_id -> profiles.id
+  // para obter o nome/avatar do destinatário.
   const { data, error } = await supabase
     .from("icon_card_shares")
     .select(`
-      id,
-      card_id,
-      shared_with_user_id,
-      shared_by_user_id,
-      created_at,
+      *,
       profiles (first_name, last_name, avatar_url)
     `)
     .eq("card_id", cardId)
     .order("created_at", { ascending: false });
 
   if (error) {
-    // Logamos o erro para ajudar na depuração
-    console.error("Supabase fetchCardShares error:", error);
     throw new Error(error.message);
   }
   return data as CardShare[] || [];
