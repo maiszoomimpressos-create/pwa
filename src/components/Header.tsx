@@ -85,9 +85,6 @@ const Header = () => {
           <Link to="/" className="text-lg font-semibold">
             Home
           </Link>
-          <Link to="/dashboard" className="text-lg font-semibold">
-            Dashboard
-          </Link>
           {isAuthenticated && (
             <Link to="/profile" className="text-lg font-semibold">
               Perfil
