@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { IconCard } from "@/hooks/useIconCards";
 import * as LucideIcons from "lucide-react";
-import { MoreVertical, Share2, Trash2, Pencil } from "lucide-react";
+import { Share2, Trash2, Pencil } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,9 @@ import ShareIconCardDialog from "./ShareIconCardDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import EditIconCardSheet from "./EditIconCardSheet"; // Será criado no próximo passo
+import EditIconCardSheet from "./EditIconCardSheet";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface IconCardComponentProps {
   card: IconCard;
@@ -36,9 +38,9 @@ const IconCardContent: React.FC<{ card: IconCard }> = ({ card }) => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-0 pt-4 h-full">
-      <IconComponent size={48} style={{ color: card.color }} />
-      <span className="text-sm mt-2 font-medium text-center text-foreground px-1 truncate w-full">
+    <div className="flex flex-col items-center justify-center h-full w-full">
+      <IconComponent size={40} style={{ color: card.color }} />
+      <span className="text-sm mt-1 font-medium text-center text-foreground px-1 truncate w-full">
         {card.name || card.icon_name}
       </span>
     </div>
@@ -62,78 +64,83 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
     setIsDeleting(false);
   };
   
-  const cardClasses = "relative flex flex-col items-center justify-center p-4 h-32 w-32 transition-shadow hover:shadow-lg cursor-pointer group";
+  // Aumentando o tamanho do card para acomodar as ações
+  const cardClasses = "relative flex flex-col justify-between p-2 h-36 w-36 transition-shadow hover:shadow-lg group";
 
-  const CardWrapper = card.link ? (
-    <a href={card.link} target="_blank" rel="noopener noreferrer" className="block">
-      <Card className={cardClasses}>
-        <CardContent className="p-0 pt-4 h-full w-full">
-          <IconCardContent card={card} />
-        </CardContent>
-      </Card>
-    </a>
-  ) : (
+  const CardInner = (
     <Card className={cardClasses}>
-      <CardContent className="p-0 pt-4 h-full w-full">
+      {/* Conteúdo Principal do Ícone */}
+      <CardContent className="p-0 flex-grow flex items-center justify-center">
         <IconCardContent card={card} />
       </CardContent>
+
+      {/* Ações (Visíveis no hover ou em telas pequenas) */}
+      <div className="flex justify-center space-x-2 p-1 opacity-0 group-hover:opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
+        
+        {/* Botão de Edição */}
+        <EditIconCardSheet card={card} onIconUpdated={onCardAction}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7">
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Editar</TooltipContent>
+          </Tooltip>
+        </EditIconCardSheet>
+
+        {/* Botão de Compartilhamento */}
+        <ShareIconCardDialog card={card} onShared={onCardAction}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7">
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Compartilhar</TooltipContent>
+          </Tooltip>
+        </ShareIconCardDialog>
+
+        {/* Botão de Exclusão */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Excluir</TooltipContent>
+            </Tooltip>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação não pode ser desfeita. Isso excluirá permanentemente o card "{card.name || card.icon_name}".
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
+                {isDeleting ? "Excluindo..." : "Excluir"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </Card>
   );
 
   return (
     <div className="relative">
-      {CardWrapper}
-      
-      {/* Dropdown Menu para Ações */}
-      <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="p-1 rounded-full bg-background/80 hover:bg-background border">
-              <MoreVertical className="h-4 w-4 text-muted-foreground" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            
-            {/* Ação de Edição (usando o componente que será criado) */}
-            <EditIconCardSheet card={card} onIconUpdated={onCardAction}>
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                <Pencil className="mr-2 h-4 w-4" /> Editar
-              </DropdownMenuItem>
-            </EditIconCardSheet>
-
-            <ShareIconCardDialog card={card} onShared={onCardAction}>
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                <Share2 className="mr-2 h-4 w-4" /> Compartilhar
-              </DropdownMenuItem>
-            </ShareIconCardDialog>
-            
-            <DropdownMenuSeparator />
-            
-            {/* Ação de Exclusão (usando AlertDialog para confirmação) */}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive">
-                  <Trash2 className="mr-2 h-4 w-4" /> Excluir
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Esta ação não pode ser desfeita. Isso excluirá permanentemente o card "{card.name || card.icon_name}".
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
-                    {isDeleting ? "Excluindo..." : "Excluir"}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      {card.link ? (
+        <a href={card.link} target="_blank" rel="noopener noreferrer" className="block">
+          {CardInner}
+        </a>
+      ) : (
+        CardInner
+      )}
     </div>
   );
 };
