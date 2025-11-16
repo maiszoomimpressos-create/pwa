@@ -122,6 +122,15 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
       <IconCardContent card={card} />
     </CardContent>
   );
+  
+  // Determina o nome do proprietário para cards compartilhados
+  let ownerName = "Proprietário Desconhecido";
+  if (card.owner_profile?.first_name) {
+    ownerName = card.owner_profile.first_name;
+    if (card.owner_profile.last_name) {
+      ownerName += ` ${card.owner_profile.last_name}`;
+    }
+  }
 
   return (
     <Card className={cardClasses}>
@@ -133,7 +142,9 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
               <Users className="h-3 w-3" />
             </div>
           </TooltipTrigger>
-          <TooltipContent>Compartilhado com você</TooltipContent>
+          <TooltipContent>
+            Compartilhado por: {ownerName}
+          </TooltipContent>
         </Tooltip>
       )}
 
