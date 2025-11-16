@@ -71,7 +71,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
         .from("icon_card_shares")
         .delete()
         .eq("card_id", card.id)
-        .eq("shared_with_user_id", user?.id); // Garantia extra, mas o RLS já faz isso
+        .eq("shared_with_user_id", user?.id);
 
       error = removeError;
       successMessage = `Compartilhamento do item '${card.name || card.icon_name}' removido com sucesso.`;
@@ -87,10 +87,15 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
     setIsDeleting(false);
   };
   
-  // Ajustando o tamanho do card para acomodar as ações visíveis
   const cardClasses = "relative flex flex-col justify-between p-0 h-40 w-36 transition-shadow hover:shadow-lg";
 
-  const CardInner = (
+  const CardContentArea = (
+    <CardContent className="p-0 flex-grow flex items-center justify-center">
+      <IconCardContent card={card} />
+    </CardContent>
+  );
+
+  return (
     <Card className={cardClasses}>
       {/* Badge para cards compartilhados */}
       {!isOwner && (
@@ -104,10 +109,16 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
         </Tooltip>
       )}
 
-      {/* Conteúdo Principal do Ícone */}
-      <CardContent className="p-0 flex-grow flex items-center justify-center">
-        <IconCardContent card={card} />
-      </CardContent>
+      {/* Conteúdo Principal (Clicável se houver link) */}
+      {card.link ? (
+        <a href={card.link} target="_blank" rel="noopener noreferrer" className="block flex-grow">
+          {CardContentArea}
+        </a>
+      ) : (
+        <div className="flex-grow">
+          {CardContentArea}
+        </div>
+      )}
 
       {/* Ações (Sempre Visíveis) */}
       <div className="flex justify-center space-x-1 p-1 border-t bg-muted/30">
@@ -191,18 +202,6 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
         </AlertDialog>
       </div>
     </Card>
-  );
-
-  return (
-    <div className="relative">
-      {card.link ? (
-        <a href={card.link} target="_blank" rel="noopener noreferrer" className="block">
-          {CardInner}
-        </a>
-      ) : (
-        CardInner
-      )}
-    </div>
   );
 };
 
