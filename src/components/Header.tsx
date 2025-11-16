@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, LogOut, User as UserIcon } from "lucide-react";
+import { Search, Menu, LogOut, User as UserIcon, Bell } from "lucide-react";
 import { useAuth } from "@/integrations/supabase/auth";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -69,6 +69,15 @@ const Header = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        
+        {/* Novo item: Notificações */}
+        <Link to="/notifications">
+          <DropdownMenuItem>
+            <Bell className="mr-2 h-4 w-4" />
+            <span>Notificações</span>
+          </DropdownMenuItem>
+        </Link>
+        
         <Link to="/profile">
           <DropdownMenuItem>
             <UserIcon className="mr-2 h-4 w-4" />
@@ -97,9 +106,17 @@ const Header = () => {
             Home
           </Link>
           {isAuthenticated && (
-            <Link to="/profile" className="text-lg font-semibold">
-              Perfil
-            </Link>
+            <>
+              <Link to="/dashboard" className="text-lg font-semibold">
+                Dashboard
+              </Link>
+              <Link to="/notifications" className="text-lg font-semibold">
+                Notificações
+              </Link>
+              <Link to="/profile" className="text-lg font-semibold">
+                Perfil
+              </Link>
+            </>
           )}
           <div className="mt-4 space-y-2">
             {!isAuthenticated && AuthButtons}
