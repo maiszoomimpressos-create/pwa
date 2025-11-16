@@ -159,8 +159,8 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
                   {/* Compartilhar */}
                   <DropdownMenuItem 
                     onSelect={(e) => {
-                      // Não precisamos de e.preventDefault() aqui se o DropdownMenu for fechado
-                      // Mas mantemos para garantir que o diálogo abra antes do menu fechar completamente
+                      // Previne o fechamento do DropdownMenu para que o Dialog possa abrir
+                      e.preventDefault(); 
                       setIsShareDialogOpen(true);
                     }}
                   >
@@ -171,6 +171,8 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
                   {/* Gerenciar */}
                   <DropdownMenuItem 
                     onSelect={(e) => {
+                      // Previne o fechamento do DropdownMenu para que o Dialog possa abrir
+                      e.preventDefault(); 
                       setIsManageSharesDialogOpen(true);
                     }}
                   >
