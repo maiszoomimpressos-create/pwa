@@ -18,8 +18,12 @@ interface IconCardComponentProps {
 const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardAction }) => {
   const { deleteCard, isDeleting } = useIconCards();
   
-  // Acessa o componente de ícone diretamente
-  const IconComponent = card.icon_name ? (LucideIcons as any)[card.icon_name] : null;
+  // Acessa o componente de ícone dinamicamente.
+  // Garante que o valor acessado seja uma função antes de tentar usá-lo como componente.
+  const IconComponent = card.icon_name && typeof (LucideIcons as any)[card.icon_name] === 'function' 
+    ? (LucideIcons as any)[card.icon_name] 
+    : null;
+    
   const iconColor = card.icon_name ? card.color : undefined;
 
   const handleDelete = () => {
@@ -40,8 +44,8 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
     }
   };
 
-  // Verifica se IconComponent é uma função (componente React válido)
-  const isValidIconComponent = typeof IconComponent === 'function';
+  // Verifica se IconComponent é um componente React válido (função)
+  const isValidIconComponent = !!IconComponent;
 
   return (
     <Card className="flex flex-col justify-between h-full transition-shadow hover:shadow-lg">
