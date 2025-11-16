@@ -19,14 +19,10 @@ const Index = () => {
           <Button size="lg">Ir para o Dashboard</Button>
         </Link>
       ) : (
-        <div className="space-x-4">
-          <Link to="/login">
-            <Button size="lg">Entrar Agora</Button>
-          </Link>
-          <Link to="/register">
-            <Button size="lg" variant="outline">Cadastrar</Button>
-          </Link>
-        </div>
+        // Removendo os botões de Login/Cadastro conforme solicitado.
+        <p className="text-lg text-gray-500">
+          Faça login ou cadastre-se usando o menu superior.
+        </p>
       )}
     </div>
   );
