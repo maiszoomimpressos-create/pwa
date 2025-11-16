@@ -126,6 +126,7 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
         {/* Ações do Proprietário: Edição e Compartilhamento */}
         {isOwner && (
           <>
+            {/* Botão de Edição */}
             <EditIconCardSheet card={card} onIconUpdated={onCardAction}>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -150,17 +151,25 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
                 <TooltipContent>Compartilhar / Gerenciar</TooltipContent>
               </Tooltip>
               <DropdownMenuContent align="end" className="w-56">
+                {/* Compartilhar */}
                 <ShareIconCardDialog card={card} onShared={onCardAction}>
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Compartilhar com...
+                  {/* Usamos asChild para garantir que o DropdownMenuItem seja o trigger */}
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} asChild>
+                    <Button variant="ghost" className="w-full justify-start p-2 h-auto">
+                      <Share2 className="mr-2 h-4 w-4" />
+                      Compartilhar com...
+                    </Button>
                   </DropdownMenuItem>
                 </ShareIconCardDialog>
                 <DropdownMenuSeparator />
+                {/* Gerenciar */}
                 <ManageSharesDialog card={card} onSharesUpdated={onCardAction}>
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Gerenciar Compartilhamentos
+                  {/* Usamos asChild para garantir que o DropdownMenuItem seja o trigger */}
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} asChild>
+                    <Button variant="ghost" className="w-full justify-start p-2 h-auto">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Gerenciar Compartilhamentos
+                    </Button>
                   </DropdownMenuItem>
                 </ManageSharesDialog>
               </DropdownMenuContent>
