@@ -55,11 +55,13 @@ const ShareCardForm: React.FC<ShareCardFormProps> = ({ card, onShared }) => {
 
     try {
       // 1. Chamar a Edge Function para buscar o ID do usuário pelo email
-      const token = (await supabase.auth.getSession()).data.session?.access_token;
+      const session = (await supabase.auth.getSession()).data.session;
       
-      if (!token) {
-        throw new Error("Sessão não encontrada.");
+      if (!session) {
+        throw new Error("Sessão não encontrada. Por favor, faça login novamente.");
       }
+      
+      const token = session.access_token;
 
       const response = await fetch(EDGE_FUNCTION_URL, {
         method: 'POST',
@@ -71,14 +73,18 @@ const ShareCardForm: React.FC<ShareCardFormProps> = ({ card, onShared }) => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido na Edge Function.' }));
         if (response.status === 404) {
           throw new Error("Usuário com este email não encontrado.");
         }
-        throw new Error(errorData.error || "Erro ao buscar usuário.");
+        throw new Error(errorData.error || `Erro ao buscar usuário (Status: ${response.status}).`);
       }
 
       const { user_id: sharedWithUserId } = await response.json();
+      
+      if (!sharedWithUserId) {
+        throw new Error("ID do usuário destinatário não retornado pela função.");
+      }
 
       // 2. Inserir o registro de compartilhamento no banco de dados
       const { error: insertError } = await supabase.from("icon_card_shares").insert({
@@ -91,6 +97,7 @@ const ShareCardForm: React.FC<ShareCardFormProps> = ({ card, onShared }) => {
         if (insertError.code === '23505') { // Código de violação de UNIQUE constraint
           showError("Este card já foi compartilhado com este usuário.");
         } else {
+          // Se o erro for "Database query failed", ele será capturado aqui.
           throw new Error("Erro ao registrar o compartilhamento: " + insertError.message);
         }
       } else {
