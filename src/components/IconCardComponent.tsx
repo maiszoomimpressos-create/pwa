@@ -133,9 +133,14 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
             <>
               {/* Botão de Edição (Lápis) */}
               <EditIconCardSheet card={card} onIconUpdated={onCardAction}>
-                <Button variant="ghost" size="icon" className="h-7 w-7">
-                  <Pencil className="h-4 w-4" />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Editar</TooltipContent>
+                </Tooltip>
               </EditIconCardSheet>
 
               {/* Menu de Gerenciamento de Compartilhamento */}
@@ -180,9 +185,14 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
           {/* Ação de Exclusão/Remoção (Diferente para Proprietário vs. Destinatário) */}
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
-                {isOwner ? <Trash2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
+                    {isOwner ? <Trash2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{isOwner ? "Excluir Card" : "Remover Compartilhamento"}</TooltipContent>
+              </Tooltip>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
