@@ -1,11 +1,11 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, Loader2, Trash2, CheckCircle, Share2 } from "lucide-react";
+import { Bell, Loader2, Trash2, CheckCircle, Share2, ArrowLeft } from "lucide-react";
 import { useNotifications, Notification } from "@/hooks/useNotifications";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { showError, showSuccess } from "@/utils/toast";
 
@@ -86,6 +86,7 @@ const NotificationItem: React.FC<{ notification: Notification, onDelete: (id: st
 
 const NotificationsPage: React.FC = () => {
   const { notifications, isLoading, deleteNotification, markAsRead, refetchNotifications } = useNotifications();
+  const navigate = useNavigate();
   
   const handleDelete = (id: string) => {
     deleteNotification(id, {
@@ -103,6 +104,10 @@ const NotificationsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
+      <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-4">
+        <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao Dashboard
+      </Button>
+      
       <h1 className="text-3xl font-bold flex items-center">
         <Bell className="mr-3 h-7 w-7" /> Central de Notificações
       </h1>
