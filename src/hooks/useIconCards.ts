@@ -4,19 +4,19 @@ import { useAuth } from "@/integrations/supabase/auth";
 
 export interface IconCard {
   id: string;
-  user_id: string;
+  user_id: string; // ID do proprietário do card
   icon_name: string;
   color: string;
-  name: string | null; // Novo campo
-  link: string | null; // Novo campo
+  name: string | null;
+  link: string | null;
   created_at: string;
 }
 
-const fetchIconCards = async (userId: string): Promise<IconCard[]> => {
+// A função de busca agora confia no RLS para retornar cards próprios e compartilhados.
+const fetchIconCards = async (): Promise<IconCard[]> => {
   const { data, error } = await supabase
     .from("icon_cards")
     .select("*")
-    .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -31,7 +31,7 @@ export const useIconCards = () => {
 
   return useQuery<IconCard[], Error>({
     queryKey: ["iconCards", userId],
-    queryFn: () => fetchIconCards(userId!),
+    queryFn: () => fetchIconCards(),
     enabled: !!userId, // Só executa a query se o usuário estiver logado
   });
 };
