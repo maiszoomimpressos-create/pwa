@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Share2 } from "lucide-react";
@@ -10,17 +10,24 @@ import { IconCard } from "@/hooks/useIconCards";
 
 interface ShareIconCardDialogProps {
   card: IconCard;
-  children: React.ReactNode;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onShared: () => void;
 }
 
 // URL da Edge Function (usando o ID do projeto Supabase)
 const EDGE_FUNCTION_URL = "https://rqwshksgnnzcdfiensjc.supabase.co/functions/v1/get-user-id-by-email";
 
-const ShareIconCardDialog: React.FC<ShareIconCardDialogProps> = ({ card, children, onShared }) => {
-  const [open, setOpen] = useState(false);
+const ShareIconCardDialog: React.FC<ShareIconCardDialogProps> = ({ card, open, onOpenChange, onShared }) => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Resetar o email quando o diálogo fechar
+  React.useEffect(() => {
+    if (!open) {
+      setEmail("");
+    }
+  }, [open]);
 
   const handleShare = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +92,7 @@ const ShareIconCardDialog: React.FC<ShareIconCardDialogProps> = ({ card, childre
       } else {
         showSuccess(`Card compartilhado com sucesso com ${targetEmail}!`);
         setEmail("");
-        setOpen(false);
+        onOpenChange(false);
         onShared();
       }
 
@@ -98,8 +105,7 @@ const ShareIconCardDialog: React.FC<ShareIconCardDialogProps> = ({ card, childre
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Compartilhar Card: {card.name || card.icon_name}</DialogTitle>

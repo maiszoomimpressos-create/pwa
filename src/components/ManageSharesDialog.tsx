@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2, Trash2, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
@@ -11,14 +11,21 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ManageSharesDialogProps {
   card: IconCard;
-  children: React.ReactNode;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSharesUpdated: () => void;
 }
 
-const ManageSharesDialog: React.FC<ManageSharesDialogProps> = ({ card, children, onSharesUpdated }) => {
-  const [open, setOpen] = useState(false);
+const ManageSharesDialog: React.FC<ManageSharesDialogProps> = ({ card, open, onOpenChange, onSharesUpdated }) => {
   const { data: shares, isLoading, refetch } = useCardShares(card.id);
   const [isRevoking, setIsRevoking] = useState<string | null>(null);
+
+  // Refetch quando o diálogo abre
+  React.useEffect(() => {
+    if (open) {
+      refetch();
+    }
+  }, [open, refetch]);
 
   const handleRevokeShare = async (share: CardShare) => {
     setIsRevoking(share.id);
@@ -41,8 +48,7 @@ const ManageSharesDialog: React.FC<ManageSharesDialogProps> = ({ card, children,
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Gerenciar Compartilhamentos</DialogTitle>
@@ -117,7 +123,7 @@ const ManageSharesDialog: React.FC<ManageSharesDialogProps> = ({ card, children,
         </div>
         
         <div className="flex justify-end">
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Fechar
           </Button>
         </div>

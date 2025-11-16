@@ -53,6 +53,10 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
   const { user } = useAuth(); // Obtém o usuário logado
   const isOwner = user?.id === card.user_id;
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Estados para controlar a abertura dos diálogos
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isManageSharesDialogOpen, setIsManageSharesDialogOpen] = useState(false);
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -96,121 +100,141 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
   );
 
   return (
-    <Card className={cardClasses}>
-      {/* Badge para cards compartilhados */}
-      {!isOwner && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="absolute top-1 left-1 p-1 rounded-full bg-secondary/80 text-secondary-foreground z-10">
-              <Users className="h-3 w-3" />
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>Compartilhado com você</TooltipContent>
-        </Tooltip>
-      )}
-
-      {/* Conteúdo Principal (Clicável se houver link) */}
-      {card.link ? (
-        <a href={card.link} target="_blank" rel="noopener noreferrer" className="block flex-grow">
-          {CardContentArea}
-        </a>
-      ) : (
-        <div className="flex-grow">
-          {CardContentArea}
-        </div>
-      )}
-
-      {/* Ações (Sempre Visíveis) */}
-      <div className="flex justify-center space-x-1 p-1 border-t bg-muted/30">
-        
-        {/* Ações do Proprietário: Edição e Compartilhamento */}
-        {isOwner && (
-          <>
-            {/* Botão de Edição */}
-            <EditIconCardSheet card={card} onIconUpdated={onCardAction}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Editar</TooltipContent>
-              </Tooltip>
-            </EditIconCardSheet>
-
-            {/* Menu de Gerenciamento de Compartilhamento */}
-            <DropdownMenu>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-7 w-7">
-                      <Share2 className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent>Compartilhar / Gerenciar</TooltipContent>
-              </Tooltip>
-              <DropdownMenuContent align="end" className="w-56">
-                {/* Compartilhar */}
-                <ShareIconCardDialog card={card} onShared={onCardAction}>
-                  {/* Usamos asChild para garantir que o DropdownMenuItem seja o trigger */}
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} asChild>
-                    <Button variant="ghost" className="w-full justify-start p-2 h-auto">
-                      <Share2 className="mr-2 h-4 w-4" />
-                      Compartilhar com...
-                    </Button>
-                  </DropdownMenuItem>
-                </ShareIconCardDialog>
-                <DropdownMenuSeparator />
-                {/* Gerenciar */}
-                <ManageSharesDialog card={card} onSharesUpdated={onCardAction}>
-                  {/* Usamos asChild para garantir que o DropdownMenuItem seja o trigger */}
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} asChild>
-                    <Button variant="ghost" className="w-full justify-start p-2 h-auto">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Gerenciar Compartilhamentos
-                    </Button>
-                  </DropdownMenuItem>
-                </ManageSharesDialog>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
+    <>
+      <Card className={cardClasses}>
+        {/* Badge para cards compartilhados */}
+        {!isOwner && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="absolute top-1 left-1 p-1 rounded-full bg-secondary/80 text-secondary-foreground z-10">
+                <Users className="h-3 w-3" />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Compartilhado com você</TooltipContent>
+          </Tooltip>
         )}
 
-        {/* Ação de Exclusão/Remoção (Diferente para Proprietário vs. Destinatário) */}
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
-                  {isOwner ? <Trash2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{isOwner ? "Excluir Card" : "Remover Compartilhamento"}</TooltipContent>
-            </Tooltip>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                {isOwner ? "Tem certeza que deseja excluir este card?" : "Tem certeza que deseja remover este compartilhamento?"}
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                {isOwner 
-                  ? `Esta ação excluirá permanentemente o card "${card.name || card.icon_name}" para todos.`
-                  : `Esta ação apenas removerá o card "${card.name || card.icon_name}" do seu Dashboard. O card original não será afetado.`
-                }
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
-                {isDeleting ? "Processando..." : (isOwner ? "Excluir Permanentemente" : "Remover")}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
-    </Card>
+        {/* Conteúdo Principal (Clicável se houver link) */}
+        {card.link ? (
+          <a href={card.link} target="_blank" rel="noopener noreferrer" className="block flex-grow">
+            {CardContentArea}
+          </a>
+        ) : (
+          <div className="flex-grow">
+            {CardContentArea}
+          </div>
+        )}
+
+        {/* Ações (Sempre Visíveis) */}
+        <div className="flex justify-center space-x-1 p-1 border-t bg-muted/30">
+          
+          {/* Ações do Proprietário: Edição e Compartilhamento */}
+          {isOwner && (
+            <>
+              {/* Botão de Edição */}
+              <EditIconCardSheet card={card} onIconUpdated={onCardAction}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Editar</TooltipContent>
+                </Tooltip>
+              </EditIconCardSheet>
+
+              {/* Menu de Gerenciamento de Compartilhamento */}
+              <DropdownMenu>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <Share2 className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>Compartilhar / Gerenciar</TooltipContent>
+                </Tooltip>
+                <DropdownMenuContent align="end" className="w-56">
+                  {/* Compartilhar */}
+                  <DropdownMenuItem 
+                    onSelect={(e) => {
+                      e.preventDefault(); // Impede o fechamento do DropdownMenu
+                      setIsShareDialogOpen(true);
+                    }}
+                  >
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Compartilhar com...
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {/* Gerenciar */}
+                  <DropdownMenuItem 
+                    onSelect={(e) => {
+                      e.preventDefault(); // Impede o fechamento do DropdownMenu
+                      setIsManageSharesDialogOpen(true);
+                    }}
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    Gerenciar Compartilhamentos
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
+
+          {/* Ação de Exclusão/Remoção (Diferente para Proprietário vs. Destinatário) */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10">
+                    {isOwner ? <Trash2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{isOwner ? "Excluir Card" : "Remover Compartilhamento"}</TooltipContent>
+              </Tooltip>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {isOwner ? "Tem certeza que deseja excluir este card?" : "Tem certeza que deseja remover este compartilhamento?"}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {isOwner 
+                    ? `Esta ação excluirá permanentemente o card "${card.name || card.icon_name}" para todos.`
+                    : `Esta ação apenas removerá o card "${card.name || card.icon_name}" do seu Dashboard. O card original não será afetado.`
+                  }
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
+                  {isDeleting ? "Processando..." : (isOwner ? "Excluir Permanentemente" : "Remover")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </Card>
+      
+      {/* Diálogos Controlados (Renderizados fora do Card) */}
+      {isOwner && (
+        <>
+          <ShareIconCardDialog 
+            card={card} 
+            open={isShareDialogOpen} 
+            onOpenChange={setIsShareDialogOpen} 
+            onShared={onCardAction} 
+          />
+          <ManageSharesDialog 
+            card={card} 
+            open={isManageSharesDialogOpen} 
+            onOpenChange={setIsManageSharesDialogOpen} 
+            onSharesUpdated={onCardAction} 
+          />
+        </>
+      )}
+    </>
   );
 };
 
