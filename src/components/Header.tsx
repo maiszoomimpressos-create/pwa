@@ -57,10 +57,12 @@ const Header = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => alert("Perfil clicado")}>
-          <UserIcon className="mr-2 h-4 w-4" />
-          <span>Perfil</span>
-        </DropdownMenuItem>
+        <Link to="/profile">
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <UserIcon className="mr-2 h-4 w-4" />
+            <span>Perfil</span>
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />

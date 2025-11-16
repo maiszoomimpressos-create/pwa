@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile"; // Importando a nova página
 import { AuthProvider } from "./integrations/supabase/auth";
 import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -43,6 +44,16 @@ const App = () => (
                 <ProtectedRoute>
                   <AppLayout>
                     <Dashboard />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Profile />
                   </AppLayout>
                 </ProtectedRoute>
               }
