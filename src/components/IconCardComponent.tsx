@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { IconCard } from "@/hooks/useIconCards";
 import * as LucideIcons from "lucide-react";
-import { MoreVertical, Share2, Trash2 } from "lucide-react";
+import { MoreVertical, Share2, Trash2, Pencil } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ShareIconCardDialog from "./ShareIconCardDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { showError, showSuccess } from "@/utils/toast";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import EditIconCardSheet from "./EditIconCardSheet"; // Será criado no próximo passo
 
 interface IconCardComponentProps {
   card: IconCard;
@@ -42,7 +46,21 @@ const IconCardContent: React.FC<{ card: IconCard }> = ({ card }) => {
 };
 
 const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardAction = () => {} }) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    const { error } = await supabase.from("icon_cards").delete().eq("id", card.id);
+
+    if (error) {
+      console.error("Erro ao excluir card:", error);
+      showError("Erro ao excluir o item: " + error.message);
+    } else {
+      showSuccess(`Item '${card.name || card.icon_name}' excluído com sucesso.`);
+      onCardAction();
+    }
+    setIsDeleting(false);
+  };
   
   const cardClasses = "relative flex flex-col items-center justify-center p-4 h-32 w-32 transition-shadow hover:shadow-lg cursor-pointer group";
 
@@ -75,6 +93,14 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
+            
+            {/* Ação de Edição (usando o componente que será criado) */}
+            <EditIconCardSheet card={card} onIconUpdated={onCardAction}>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <Pencil className="mr-2 h-4 w-4" /> Editar
+              </DropdownMenuItem>
+            </EditIconCardSheet>
+
             <ShareIconCardDialog card={card} onShared={onCardAction}>
               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                 <Share2 className="mr-2 h-4 w-4" /> Compartilhar
@@ -83,9 +109,28 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
             
             <DropdownMenuSeparator />
             
-            <DropdownMenuItem className="text-destructive">
-              <Trash2 className="mr-2 h-4 w-4" /> Excluir
-            </DropdownMenuItem>
+            {/* Ação de Exclusão (usando AlertDialog para confirmação) */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive">
+                  <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação não pode ser desfeita. Isso excluirá permanentemente o card "{card.name || card.icon_name}".
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
+                    {isDeleting ? "Excluindo..." : "Excluir"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
