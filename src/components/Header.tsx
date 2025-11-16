@@ -111,7 +111,7 @@ const Header = () => {
           </Link>
         </div>
 
-        {/* Search Bar (Desktop/Tablet) */}
+        {/* Search Bar (Oculta em telas pequenas, visível a partir de md) */}
         <div className="hidden md:flex flex-1 max-w-md mx-4">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

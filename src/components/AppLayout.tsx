@@ -10,6 +10,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      {/* Ajuste: pt-16 garante espaço para o header fixo. mx-auto e w-full garantem centralização e largura total. */}
       <main className="flex-grow p-4 md:p-8 pt-16 max-w-7xl mx-auto w-full">
         {children}
       </main>

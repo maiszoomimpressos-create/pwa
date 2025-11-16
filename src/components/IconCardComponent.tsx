@@ -91,7 +91,8 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
     setIsDeleting(false);
   };
   
-  const cardClasses = "relative flex flex-col justify-between p-0 h-40 w-36 transition-shadow hover:shadow-lg";
+  // Ajustando o tamanho do card para ser mais flexível em grades responsivas
+  const cardClasses = "relative flex flex-col justify-between p-0 h-36 w-full transition-shadow hover:shadow-lg";
 
   const CardContentArea = (
     <CardContent className="p-0 flex-grow flex items-center justify-center">

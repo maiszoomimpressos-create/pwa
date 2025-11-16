@@ -15,7 +15,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="p-4 md:p-8">
+    <div className="p-0"> {/* Removendo padding aqui, pois AppLayout já aplica p-4/p-8 */}
       <h1 className="text-3xl font-bold mb-6">Seus Cards de Ícones</h1>
       <p className="text-lg text-muted-foreground mb-8 max-w-xl">
         Bem-vindo, {user?.email}! Adicione e gerencie seus cards de ícones personalizados.
@@ -35,7 +35,7 @@ const Dashboard = () => {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 w-full">
           {iconCards && iconCards.length > 0 ? (
             iconCards.map((card) => (
               <IconCardComponent key={card.id} card={card} onCardAction={handleIconAction} />
