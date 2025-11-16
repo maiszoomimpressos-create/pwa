@@ -146,6 +146,9 @@ importers:
       react-router-dom:
         specifier: ^6.26.2
         version: 6.30.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-text-mask:
+        specifier: ^5.5.0
+        version: 5.5.0(react@18.3.1)
       recharts:
         specifier: ^2.12.7
         version: 2.15.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -158,6 +161,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
+      text-mask-addons:
+        specifier: ^3.8.0
+        version: 3.8.0
       vaul:
         specifier: ^0.9.3
         version: 0.9.9(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2226,6 +2232,11 @@ packages:
       '@types/react':
         optional: true
 
+  react-text-mask@5.5.0:
+    resolution: {integrity: sha512-SLJlJQxa0uonMXsnXRpv5abIepGmHz77ylQcra0GNd7Jtk4Wj2Mtp85uGQHv1avba2uI8ZvRpIEQPpJKsqRGYw==}
+    peerDependencies:
+      react: ^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+
   react-transition-group@4.4.5:
     resolution: {integrity: sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==}
     peerDependencies:
@@ -2352,6 +2363,9 @@ packages:
     resolution: {integrity: sha512-w33E2aCvSDP0tW9RZuNXadXlkHXqFzSkQew/aIa2i/Sj8fThxwovwlXHSPXTbAHwEIhBFXAedUhP2tueAKP8Og==}
     engines: {node: '>=14.0.0'}
     hasBin: true
+
+  text-mask-addons@3.8.0:
+    resolution: {integrity: sha512-VSZSdc/tKn4zGxgpJ+uNBzoW1t472AoAFIlbw1K7hSNXz0DfSBYDJNRxLqgxOfWw1BY2z6DQpm7g0sYZn5qLpg==}
 
   thenify-all@1.6.0:
     resolution: {integrity: sha512-RNxQH/qI8/t3thXJDwcstUO4zeqo64+Uy/+sNVRBx4Xn2OX+OZ9oP+iJnNFqplFra2ZUVeKCSa2oVWi3T4uVmA==}
@@ -4441,6 +4455,11 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.20
 
+  react-text-mask@5.5.0(react@18.3.1):
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.3.1
+
   react-transition-group@4.4.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@babel/runtime': 7.27.0
@@ -4612,6 +4631,8 @@ snapshots:
       sucrase: 3.35.0
     transitivePeerDependencies:
       - ts-node
+
+  text-mask-addons@3.8.0: {}
 
   thenify-all@1.6.0:
     dependencies:

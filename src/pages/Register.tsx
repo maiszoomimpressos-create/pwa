@@ -1,8 +1,7 @@
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import RegisterForm from "@/components/RegisterForm";
+import { Button } from "@/components/ui/button";
 
 const Register = () => {
   return (
@@ -12,53 +11,13 @@ const Register = () => {
           <CardTitle className="text-2xl text-center">Cadastrar</CardTitle>
         </CardHeader>
         <CardContent>
-          <Auth
-            supabaseClient={supabase}
-            providers={[]}
-            appearance={{
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: "hsl(var(--primary))",
-                    brandAccent: "hsl(var(--primary-foreground))",
-                  },
-                },
-              },
-            }}
-            theme="light"
-            view="sign_up"
-            redirectTo={window.location.origin + "/dashboard"}
-            localization={{
-              variables: {
-                sign_up: {
-                  email_label: "Endereço de Email",
-                  password_label: "Crie uma Senha",
-                  email_input_placeholder: "Seu email",
-                  password_input_placeholder: "Sua senha",
-                  phone_label: "Número de Telefone", // Adicionando label para telefone
-                  phone_input_placeholder: "Seu telefone (opcional)", // Adicionando placeholder
-                  button_label: "Cadastrar",
-                  link_text: "Não tem uma conta? Cadastre-se",
-                },
-                sign_in: {
-                  link_text: "Já tem uma conta? Entrar",
-                },
-              },
-            }}
-            // Habilitando o campo de telefone
-            fields={[
-              {
-                name: 'phone',
-                label: 'Número de Telefone',
-                placeholder: 'Seu telefone (opcional)',
-                type: 'phone',
-                required: false,
-              },
-            ]}
-          />
-          <div className="mt-4 text-center">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-primary underline">
+          <RegisterForm />
+          
+          <div className="mt-4 text-center space-y-2">
+            <Link to="/login" className="text-sm text-primary hover:underline block">
+              Já tem uma conta? Entrar
+            </Link>
+            <Link to="/" className="text-sm text-muted-foreground hover:text-primary underline block">
               Voltar ao Início
             </Link>
           </div>
