@@ -17,21 +17,29 @@ interface EditIconCardSheetProps {
 
 const EditIconCardSheet: React.FC<EditIconCardSheetProps> = ({ card, children, onIconUpdated }) => {
   const [open, setOpen] = useState(false);
+  
+  // Estados internos inicializados com os valores do card
   const [selectedIconName, setSelectedIconName] = useState<string>(card.icon_name);
   const [color, setColor] = useState<string>(card.color);
   const [name, setName] = useState<string>(card.name || "");
   const [link, setLink] = useState<string>(card.link || "");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Sincroniza o estado interno com as props do card sempre que o sheet for aberto
+  // Função para resetar os estados para os valores atuais do card
+  const resetForm = () => {
+    setSelectedIconName(card.icon_name);
+    setColor(card.color);
+    setName(card.name || "");
+    setLink(card.link || "");
+  };
+
+  // Sincroniza o estado interno com as props do card quando o sheet abre
   useEffect(() => {
     if (open) {
-      setSelectedIconName(card.icon_name);
-      setColor(card.color);
-      setName(card.name || "");
-      setLink(card.link || "");
+      resetForm();
     }
-  }, [open, card]);
+  }, [open, card.id, card.icon_name, card.color, card.name, card.link]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +75,16 @@ const EditIconCardSheet: React.FC<EditIconCardSheetProps> = ({ card, children, o
   };
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet 
+      open={open} 
+      onOpenChange={(newOpen) => {
+        setOpen(newOpen);
+        // Se estiver fechando, resetamos o formulário para o estado original do card
+        if (!newOpen) {
+          resetForm();
+        }
+      }}
+    >
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent side="right" className="sm:max-w-md">
         <SheetHeader>
