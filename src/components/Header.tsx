@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import InstallPWAInstructions from "./InstallPWAInstructions";
 
 const Header = () => {
   const { user, isLoading } = useAuth();
@@ -124,6 +125,9 @@ const Header = () => {
 
         {/* Auth/User Actions */}
         <div className="flex items-center space-x-2">
+          {/* PWA Install Button (Renders null if not applicable) */}
+          <InstallPWAInstructions /> 
+          
           {isLoading ? (
             <div className="h-8 w-20 animate-pulse rounded-md bg-muted"></div>
           ) : isAuthenticated ? (
