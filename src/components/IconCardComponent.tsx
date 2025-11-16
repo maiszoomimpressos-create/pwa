@@ -2,13 +2,13 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { IconCard, useIconCards } from "@/hooks/useIconCards";
-import * as LucideIcons from "lucide-react";
 import { Pencil, Share2, Trash2, Loader2, ExternalLink, HelpCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { showError, showSuccess } from "@/utils/toast";
 import EditIconCardSheet from "./EditIconCardSheet";
 import ShareIconCardDialog from "./ShareIconCardDialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { LucideIconMap } from "@/utils/iconMap"; // Importando o mapa seguro
 
 interface IconCardComponentProps {
   card: IconCard;
@@ -18,11 +18,8 @@ interface IconCardComponentProps {
 const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardAction }) => {
   const { deleteCard, isDeleting } = useIconCards();
   
-  // Acessa o componente de ícone dinamicamente.
-  // Garante que o valor acessado seja uma função antes de tentar usá-lo como componente.
-  const IconComponent = card.icon_name && typeof (LucideIcons as any)[card.icon_name] === 'function' 
-    ? (LucideIcons as any)[card.icon_name] 
-    : null;
+  // Acessa o componente de ícone diretamente do mapa seguro
+  const IconComponent = card.icon_name ? LucideIconMap[card.icon_name] : null;
     
   const iconColor = card.icon_name ? card.color : undefined;
 

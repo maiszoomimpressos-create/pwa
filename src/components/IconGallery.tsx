@@ -1,19 +1,11 @@
 import React, { useState, useMemo } from "react";
-import * as LucideIcons from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { LucideIconMap } from "@/utils/iconMap";
+import { LucideProps } from "lucide-react";
 
-// Cria um mapa de ícones válidos (nome -> componente)
-const validIcons = Object.entries(LucideIcons)
-  .filter(([, component]) => typeof component === 'function')
-  .filter(([name]) => name !== 'createReactComponent' && name !== 'Icon' && name !== 'default')
-  .reduce((acc, [name, component]) => {
-    acc[name] = component;
-    return acc;
-  }, {} as Record<string, React.FC<LucideIcons.LucideProps>>);
-
-const iconNames = Object.keys(validIcons);
+const iconNames = Object.keys(LucideIconMap);
 
 interface IconGalleryProps {
   selectedIconName: string | null;
@@ -40,11 +32,10 @@ const IconGallery: React.FC<IconGalleryProps> = ({ selectedIconName, onSelectIco
       <ScrollArea className="h-[200px] w-full rounded-md border p-4">
         <div className="grid grid-cols-6 gap-2">
           {filteredIcons.map((name) => {
-            // Acessa o componente de ícone diretamente do mapa validIcons
-            const IconComponent = validIcons[name];
+            // Acessa o componente de ícone diretamente do mapa LucideIconMap
+            const IconComponent = LucideIconMap[name];
             const isSelected = selectedIconName === name;
             
-            // Esta verificação é redundante, mas mantida por segurança
             if (!IconComponent) return null; 
 
             return (
