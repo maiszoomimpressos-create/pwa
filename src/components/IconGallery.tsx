@@ -6,7 +6,10 @@ import { cn } from "@/lib/utils";
 
 // Lista de ícones Lucide que queremos exibir
 const iconNames = Object.keys(LucideIcons).filter(name => 
-  name !== 'createReactComponent' && name !== 'Icon' && name !== 'default'
+  typeof (LucideIcons as any)[name] === 'function' && // Garante que é um componente (função)
+  name !== 'createReactComponent' && 
+  name !== 'Icon' && 
+  name !== 'default'
 );
 
 interface IconGalleryProps {
@@ -38,8 +41,8 @@ const IconGallery: React.FC<IconGalleryProps> = ({ selectedIconName, onSelectIco
             const IconComponent = (LucideIcons as any)[name];
             const isSelected = selectedIconName === name;
             
-            // Verifica se é um componente válido (função)
-            if (typeof IconComponent !== 'function') return null;
+            // Não precisamos mais da verificação aqui, pois já filtramos a lista.
+            if (!IconComponent) return null; 
 
             return (
               <button
