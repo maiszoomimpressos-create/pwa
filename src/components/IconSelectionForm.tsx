@@ -26,12 +26,18 @@ interface IconSelectionFormProps {
 const IconSelectionForm: React.FC<IconSelectionFormProps> = ({ onIconAdded }) => {
   const [selectedIconName, setSelectedIconName] = useState<string | null>(null);
   const [color, setColor] = useState<string>("#000000");
+  const [name, setName] = useState<string>("");
+  const [link, setLink] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedIconName) {
       showError("Por favor, selecione um ícone.");
+      return;
+    }
+    if (!name.trim()) {
+      showError("Por favor, insira um nome para o item.");
       return;
     }
 
@@ -50,16 +56,20 @@ const IconSelectionForm: React.FC<IconSelectionFormProps> = ({ onIconAdded }) =>
         user_id: user.id,
         icon_name: selectedIconName,
         color: color,
+        name: name.trim(),
+        link: link.trim() || null, // Salva link ou null se vazio
       },
     ]);
 
     if (error) {
       console.error("Erro ao salvar ícone:", error);
-      showError("Erro ao adicionar o ícone: " + error.message);
+      showError("Erro ao adicionar o item: " + error.message);
     } else {
-      showSuccess(`Ícone '${selectedIconName}' adicionado com sucesso!`);
+      showSuccess(`Item '${name}' adicionado com sucesso!`);
       setSelectedIconName(null);
       setColor("#000000");
+      setName("");
+      setLink("");
       onIconAdded(); // Notifica o pai para fechar o sheet ou atualizar a lista
     }
 
@@ -68,23 +78,36 @@ const IconSelectionForm: React.FC<IconSelectionFormProps> = ({ onIconAdded }) =>
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      
+      <div className="space-y-2">
+        <Label htmlFor="name">Nome do Item</Label>
+        <Input
+          id="name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Ex: Meu Link Favorito"
+          required
+        />
+      </div>
+
       <div className="space-y-2">
         <Label>Selecione um Ícone</Label>
         <div className="grid grid-cols-4 gap-3">
-          {availableIcons.map(({ name, Icon }) => (
+          {availableIcons.map(({ name: iconName, Icon }) => (
             <Card
-              key={name}
+              key={iconName}
               className={`cursor-pointer transition-all ${
-                selectedIconName === name
+                selectedIconName === iconName
                   ? "border-primary ring-2 ring-primary"
                   : "hover:border-primary/50"
               }`}
-              onClick={() => setSelectedIconName(name)}
+              onClick={() => setSelectedIconName(iconName)}
             >
               <CardContent className="flex flex-col items-center justify-center p-3 relative">
-                <Icon size={24} style={{ color: selectedIconName === name ? color : 'currentColor' }} />
-                <span className="text-xs mt-1 text-center">{name}</span>
-                {selectedIconName === name && (
+                <Icon size={24} style={{ color: selectedIconName === iconName ? color : 'currentColor' }} />
+                <span className="text-xs mt-1 text-center">{iconName}</span>
+                {selectedIconName === iconName && (
                   <Check className="absolute top-1 right-1 h-4 w-4 text-primary" />
                 )}
               </CardContent>
@@ -112,12 +135,23 @@ const IconSelectionForm: React.FC<IconSelectionFormProps> = ({ onIconAdded }) =>
           />
         </div>
       </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="link">Link (URL)</Label>
+        <Input
+          id="link"
+          type="url"
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+          placeholder="https://exemplo.com"
+        />
+      </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading || !selectedIconName}>
+      <Button type="submit" className="w-full" disabled={isLoading || !selectedIconName || !name.trim()}>
         {isLoading ? (
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         ) : (
-          "Adicionar Card"
+          "Salvar Item"
         )}
       </Button>
     </form>

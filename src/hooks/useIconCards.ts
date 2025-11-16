@@ -7,6 +7,8 @@ export interface IconCard {
   user_id: string;
   icon_name: string;
   color: string;
+  name: string | null; // Novo campo
+  link: string | null; // Novo campo
   created_at: string;
 }
 

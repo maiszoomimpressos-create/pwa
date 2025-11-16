@@ -1,16 +1,17 @@
 import { useAuth } from "@/integrations/supabase/auth";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Plus } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
+import AddIconCardSheet from "@/components/AddIconCardSheet";
+import { useIconCards } from "@/hooks/useIconCards"; // Importado para forçar o refetch se necessário
 
 const Dashboard = () => {
   const { user } = useAuth();
+  // Usamos o refetch do useIconCards para garantir que a lista na Index seja atualizada
+  const { refetch } = useIconCards(); 
 
-  // Mantendo a função de logout caso seja necessária em outro lugar, mas removendo o botão.
-  // const handleLogout = async () => {
-  //   await supabase.auth.signOut();
-  // };
+  const handleIconAdded = () => {
+    refetch();
+  };
 
   return (
     <div className="p-4 md:p-8">
@@ -19,11 +20,11 @@ const Dashboard = () => {
         Bem-vindo, {user?.email}! Esta é a sua área restrita.
       </p>
       
-      <Link to="/">
+      <AddIconCardSheet onIconAdded={handleIconAdded}>
         <Button variant="default">
           <Plus className="mr-2 h-4 w-4" /> Adicionar Item
         </Button>
-      </Link>
+      </AddIconCardSheet>
     </div>
   );
 };
