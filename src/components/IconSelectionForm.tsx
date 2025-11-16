@@ -43,6 +43,7 @@ const IconSelectionForm: React.FC<IconSelectionFormProps> = ({ onIconAdded }) =>
       {
         user_id: user.id,
         icon_name: selectedIconName,
+        icon_url: null, // Sempre nulo na criação
         color: color,
         name: name.trim(),
         link: link.trim() || null, // Salva link ou null se vazio
@@ -86,6 +87,9 @@ const IconSelectionForm: React.FC<IconSelectionFormProps> = ({ onIconAdded }) =>
           onSelectIcon={setSelectedIconName}
           color={color}
         />
+        <p className="text-xs text-muted-foreground">
+          Você poderá adicionar uma imagem personalizada após a criação, editando o card.
+        </p>
       </div>
 
       <div className="space-y-2">

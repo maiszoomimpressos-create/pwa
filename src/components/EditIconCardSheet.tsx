@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import IconGallery from "./IconGallery";
 import { IconCard } from "@/hooks/useIconCards";
+import CardIconImageUpload from "./CardIconImageUpload";
 
 interface EditIconCardSheetProps {
   card: IconCard;
@@ -17,7 +18,8 @@ interface EditIconCardSheetProps {
 
 const EditIconCardSheet: React.FC<EditIconCardSheetProps> = ({ card, children, onIconUpdated }) => {
   const [open, setOpen] = useState(false);
-  const [selectedIconName, setSelectedIconName] = useState<string>(card.icon_name);
+  const [selectedIconName, setSelectedIconName] = useState<string | null>(card.icon_name);
+  const [iconUrl, setIconUrl] = useState<string | null>(card.icon_url);
   const [color, setColor] = useState<string>(card.color);
   const [name, setName] = useState<string>(card.name || "");
   const [link, setLink] = useState<string>(card.link || "");
@@ -27,6 +29,7 @@ const EditIconCardSheet: React.FC<EditIconCardSheetProps> = ({ card, children, o
   useEffect(() => {
     if (open) {
       setSelectedIconName(card.icon_name);
+      setIconUrl(card.icon_url);
       setColor(card.color);
       setName(card.name || "");
       setLink(card.link || "");
@@ -35,8 +38,9 @@ const EditIconCardSheet: React.FC<EditIconCardSheetProps> = ({ card, children, o
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedIconName) {
-      showError("Por favor, selecione um ícone.");
+    
+    if (!iconUrl && !selectedIconName) {
+      showError("Por favor, selecione um ícone ou faça upload de uma imagem.");
       return;
     }
     if (!name.trim()) {
@@ -46,12 +50,15 @@ const EditIconCardSheet: React.FC<EditIconCardSheetProps> = ({ card, children, o
 
     setIsLoading(true);
     
-    const { error } = await supabase.from("icon_cards").update({
+    const updateData = {
       icon_name: selectedIconName,
+      icon_url: iconUrl,
       color: color,
       name: name.trim(),
       link: link.trim() || null,
-    })
+    };
+
+    const { error } = await supabase.from("icon_cards").update(updateData)
     .eq('id', card.id);
 
     if (error) {
@@ -64,6 +71,17 @@ const EditIconCardSheet: React.FC<EditIconCardSheetProps> = ({ card, children, o
     }
 
     setIsLoading(false);
+  };
+  
+  // Handlers para o CardIconImageUpload
+  const handleImageUploadComplete = (storagePath: string) => {
+    setIconUrl(storagePath);
+    setSelectedIconName(null); // Limpa o ícone Lucide se uma imagem for carregada
+  };
+
+  const handleImageRemove = () => {
+    setIconUrl(null);
+    // Não limpamos selectedIconName aqui, permitindo que o usuário selecione um Lucide icon em seguida.
   };
 
   return (
@@ -91,14 +109,28 @@ const EditIconCardSheet: React.FC<EditIconCardSheetProps> = ({ card, children, o
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Selecione um Ícone</Label>
-            <IconGallery 
-              selectedIconName={selectedIconName}
-              onSelectIcon={setSelectedIconName}
-              color={color}
-            />
-          </div>
+          {/* Opção de Upload de Imagem */}
+          <CardIconImageUpload 
+            cardId={card.id}
+            currentIconUrl={iconUrl}
+            onUploadComplete={handleImageUploadComplete}
+            onRemove={handleImageRemove}
+          />
+
+          {/* Galeria de Ícones Lucide (Visível apenas se não houver imagem) */}
+          {!iconUrl && (
+            <div className="space-y-2">
+              <Label>Ou Selecione um Ícone Lucide</Label>
+              <IconGallery 
+                selectedIconName={selectedIconName}
+                onSelectIcon={(iconName) => {
+                  setSelectedIconName(iconName);
+                  setIconUrl(null); // Limpa a URL se um ícone Lucide for selecionado
+                }}
+                color={color}
+              />
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="color">Cor do Ícone</Label>
@@ -109,6 +141,7 @@ const EditIconCardSheet: React.FC<EditIconCardSheetProps> = ({ card, children, o
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
                 className="h-10 w-10 p-0 cursor-pointer"
+                disabled={!!iconUrl} // Desabilita se houver imagem
               />
               <Input
                 type="text"
@@ -116,8 +149,12 @@ const EditIconCardSheet: React.FC<EditIconCardSheetProps> = ({ card, children, o
                 onChange={(e) => setColor(e.target.value)}
                 placeholder="#000000"
                 className="flex-1"
+                disabled={!!iconUrl} // Desabilita se houver imagem
               />
             </div>
+            {!!iconUrl && (
+              <p className="text-xs text-muted-foreground">A cor é ignorada ao usar uma imagem personalizada.</p>
+            )}
           </div>
           
           <div className="space-y-2">
@@ -131,7 +168,7 @@ const EditIconCardSheet: React.FC<EditIconCardSheetProps> = ({ card, children, o
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading || !selectedIconName || !name.trim()}>
+          <Button type="submit" className="w-full" disabled={isLoading || (!selectedIconName && !iconUrl) || !name.trim()}>
             {isLoading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (

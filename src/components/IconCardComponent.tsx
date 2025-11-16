@@ -29,7 +29,26 @@ interface IconCardComponentProps {
 const IconMap: { [key: string]: React.ElementType } = LucideIcons;
 
 const IconCardContent: React.FC<{ card: IconCard }> = ({ card }) => {
-  const IconComponent = IconMap[card.icon_name];
+  // 1. Se houver icon_url, exibe a imagem
+  if (card.icon_url) {
+    const publicUrl = supabase.storage.from('card_icons').getPublicUrl(card.icon_url).data.publicUrl;
+    
+    return (
+      <div className="flex flex-col items-center justify-center h-full w-full p-2">
+        <img 
+          src={publicUrl} 
+          alt={card.name || "Ícone personalizado"} 
+          className="h-10 w-10 object-contain"
+        />
+        <span className="text-sm mt-1 font-medium text-center text-foreground px-1 truncate w-full">
+          {card.name || "Personalizado"}
+        </span>
+      </div>
+    );
+  }
+
+  // 2. Se houver icon_name, exibe o ícone Lucide
+  const IconComponent = card.icon_name ? IconMap[card.icon_name] : null;
 
   if (!IconComponent) {
     return (
@@ -61,6 +80,15 @@ const IconCardComponent: React.FC<IconCardComponentProps> = ({ card, onCardActio
     let successMessage = "";
 
     if (isOwner) {
+      // Se houver um icon_url, tentamos deletar o arquivo do storage primeiro
+      if (card.icon_url) {
+        const { error: storageError } = await supabase.storage.from('card_icons').remove([card.icon_url]);
+        if (storageError && storageError.message !== 'The resource was not found') {
+          console.warn("Aviso: Falha ao deletar arquivo de ícone do storage:", storageError);
+          // Continuamos mesmo com erro no storage, pois o card é mais importante
+        }
+      }
+      
       // Excluir o card original (RLS garante que apenas o proprietário pode fazer isso)
       const { error: deleteError } = await supabase.from("icon_cards").delete().eq("id", card.id);
       error = deleteError;
